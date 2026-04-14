@@ -7,6 +7,18 @@
 <meta name="description" content="Artigos técnicos sobre transplante capilar, calvície, FUE Sapphire, DHI Choi, pós-operatório e saúde capilar. Corpo clínico do Balneário Hair Institute.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://www.balneariohair.com.br/blog/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Blog sobre Transplante Capilar | Balneário Hair Institute">
+<meta property="og:description" content="Artigos técnicos sobre transplante capilar, calvície, FUE Sapphire, DHI Choi e pós-operatório. Corpo clínico do BHI, Balneário Camboriú.">
+<meta property="og:url" content="https://www.balneariohair.com.br/blog/">
+<meta property="og:image" content="https://www.balneariohair.com.br/fotos/seo/og-image-balneario-hair-institute.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Balneário Hair Institute">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Blog sobre Transplante Capilar | BHI">
+<meta name="twitter:description" content="Artigos técnicos sobre transplante capilar em Balneário Camboriú.">
+<meta name="twitter:image" content="https://www.balneariohair.com.br/fotos/seo/og-image-balneario-hair-institute.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-P9KH9B2W');</script>
@@ -325,6 +337,10 @@ a{text-decoration:none;color:inherit}
 let mostrados=9;const total=29;
 function carregarMais(){const ocultos=document.querySelectorAll('.blog-card.oculto');let r=0;ocultos.forEach(c=>{if(r<10){c.classList.remove('oculto');c.style.opacity='0';c.style.transition='opacity .4s ease';setTimeout(()=>c.style.opacity='1',r*50);r++;mostrados++;}});const restam=document.querySelectorAll('.blog-card.oculto').length;document.getElementById('mais-contador').textContent='Mostrando '+mostrados+' de '+total+' artigos';if(restam===0){document.getElementById('btn-mais').classList.add('esgotado');document.getElementById('mais-contador').textContent='Todos os '+total+' artigos carregados ✓';}}
 function filtrar(cat,btn){document.querySelectorAll('.filtro-btn').forEach(b=>b.classList.remove('ativo'));btn.classList.add('ativo');const cards=document.querySelectorAll('.blog-card');let vis=0;if(cat==='todos'){mostrados=9;let i=0;cards.forEach(c=>{c.style.display='';if(i>=9)c.classList.add('oculto');else c.classList.remove('oculto');i++;});document.getElementById('btn-mais').classList.remove('esgotado');document.getElementById('mais-contador').textContent='Mostrando 9 de '+total+' artigos';return;}cards.forEach(c=>{const match=c.dataset.cat===cat;c.style.display=match?'':'none';c.classList.remove('oculto');if(match)vis++;});document.getElementById('btn-mais').classList.add('esgotado');document.getElementById('mais-contador').textContent=vis+' artigo'+(vis!==1?'s':'')+' nesta categoria';}
+</script>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Blog","name":"Blog Balneário Hair Institute","description":"Artigos técnicos sobre transplante capilar, calvície e saúde capilar masculina.","url":"https://www.balneariohair.com.br/blog/","publisher":{"@type":"MedicalBusiness","name":"Balneário Hair Institute","url":"https://www.balneariohair.com.br","address":{"@type":"PostalAddress","streetAddress":"Rua Julieta Lins, 330","addressLocality":"Balneário Camboriú","addressRegion":"SC","postalCode":"88330-010","addressCountry":"BR"},"telephone":"+554792495146"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://www.balneariohair.com.br/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://www.balneariohair.com.br/blog/"}]}}
 </script>
 </body>
 </html>
