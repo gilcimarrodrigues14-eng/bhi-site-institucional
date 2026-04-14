@@ -1,0 +1,9 @@
+PASTA: fotos/resultados/
+Coloque aqui as 6 imagens de casos com exatamente estes nomes:
+
+resultado-transplante-capilar-caso-1.jpg  (F10)
+resultado-transplante-capilar-caso-2.jpg  (F11)
+resultado-transplante-capilar-caso-3.jpg  (F12)
+resultado-transplante-capilar-caso-4.jpg  (F13)
+resultado-transplante-capilar-caso-5.jpg  (F15)
+resultado-transplante-capilar-caso-6.jpg  (novo — 6º caso)

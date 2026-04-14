@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.balneariohair.com.br/sitemap.xml

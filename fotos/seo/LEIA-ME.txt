@@ -1,0 +1,9 @@
+PASTA: fotos/seo/
+Coloque aqui as seguintes imagens com exatamente estes nomes:
+
+og-image-balneario-hair-institute.jpg      (F23) — 1200x630px
+favicon-balneario-hair-institute.ico       (F24)
+favicon-balneario-hair-institute.png       (F24)
+blog-instrumentos-transplante-capilar.jpg  (F25)
+blog-resultado-transplante-capilar-masculino.jpg (F27)
+blog-balneario-camboriu-polo-saude.jpg     (F28)

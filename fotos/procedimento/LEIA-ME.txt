@@ -1,0 +1,6 @@
+PASTA: fotos/procedimento/
+Coloque aqui as seguintes imagens com exatamente estes nomes:
+
+maos-cirurgiao-transplante-capilar-fue.jpg     (F6)
+caneta-choi-dhi-transplante-capilar.jpg        (F7)
+lamina-safira-fue-sapphire-transplante.jpg     (F8)

@@ -1,0 +1,8 @@
+PASTA: fotos/clinica/
+Coloque aqui as seguintes imagens com exatamente estes nomes:
+
+sala-cirurgica-transplante-capilar-balneario-camboriu.jpg  (F1)
+laboratorio-enxertos-capilares-bhi.jpg                     (F2)
+area-recuperacao-clinica-capilar-balneario-camboriu.jpg    (F3)
+recepcao-balneario-hair-institute.jpg                      (F4)
+fachada-clinica-transplante-capilar-bc.jpg                 (F5)
