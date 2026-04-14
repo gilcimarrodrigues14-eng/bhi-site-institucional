@@ -412,22 +412,21 @@ img{display:block;max-width:100%;height:auto}
         </div>
         <p class="portal-disclaimer">O diagnóstico por IA é uma ferramenta de orientação inicial. O plano definitivo é estabelecido após avaliação presencial com o corpo clínico. Resultados variam conforme cada caso.</p>
       </div>
-      <div class="portal-dir">
-        <div class="portal-loading" id="portal-loading">
-          <div class="portal-loading-ring"></div>
-          <span class="portal-loading-txt">Carregando Portal</span>
+      <div class="portal-dir" style="display:flex;align-items:center;justify-content:center;padding:64px 32px">
+        <div class="portal-cta-box">
+          <div class="portal-cta-icon" aria-hidden="true">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div class="portal-cta-titulo">Diagnóstico em <em style="font-style:italic">3 minutos</em></div>
+          <p class="portal-cta-sub">4 fotos guiadas pela câmera do seu celular, análise por IA e laudo entregue na hora — direto aqui no site, sem cadastro prévio.</p>
+          <div class="portal-cta-steps">
+            <div class="portal-step"><span class="portal-step-num">1</span><span class="portal-step-txt">Captura das 4 fotos pela câmera frontal</span></div>
+            <div class="portal-step"><span class="portal-step-num">2</span><span class="portal-step-txt">Análise por inteligência artificial</span></div>
+            <div class="portal-step"><span class="portal-step-num">3</span><span class="portal-step-txt">Laudo + contato no WhatsApp</span></div>
+          </div>
+          <a href="#portal" class="portal-cta-btn" data-bhi-dx="1" onclick="if(typeof gtag==='function')gtag('event','click_cta_portal_inline')">Iniciar Diagnóstico Agora →</a>
+          <div class="portal-cta-nota">100% gratuito · sem compromisso</div>
         </div>
-        <iframe
-          id="portal-iframe"
-          class="portal-iframe"
-          src="https://bhi-platform.pages.dev/portal"
-          title="Portal do Paciente — Diagnóstico Capilar Gratuito"
-          allow="camera; microphone"
-          loading="lazy"
-          style="display:none"
-          onload="document.getElementById('portal-loading').style.display='none';this.style.display='block'"
-          onerror="document.getElementById('portal-loading').innerHTML='<a href=\'https://bhi-platform.pages.dev/portal\' target=\'_blank\' style=\'color:var(--navy);font-size:13px;font-weight:500\'>Abrir Portal →</a>'"
-        ></iframe>
       </div>
     </div>
   </div>
