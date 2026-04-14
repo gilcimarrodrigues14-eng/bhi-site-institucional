@@ -3,116 +3,328 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blog | Transplante Capilar | Balneário Hair Institute</title>
-<meta name="description" content="Artigos sobre transplante capilar, calvície, técnicas FUE e DHI, pós-operatório e saúde capilar. Balneário Hair Institute, Balneário Camboriú.">
+<title>Blog sobre Transplante Capilar | Balneário Hair Institute</title>
+<meta name="description" content="Artigos técnicos sobre transplante capilar, calvície, FUE Sapphire, DHI Choi, pós-operatório e saúde capilar. Corpo clínico do Balneário Hair Institute.">
+<meta name="robots" content="index, follow">
 <link rel="canonical" href="https://www.balneariohair.com.br/blog/">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-P9KH9B2W');</script>
 <style>
-:root{--navy:#0A1128;--navy-d:#060c1a;--prata:#B4B5B9;--prata-d:#7a7b7f;--branco:#FFFFFF;--off:#F5F4F0;--off2:#ECEAE5;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Montserrat',Arial,sans-serif}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--sans);background:var(--off);-webkit-font-smoothing:antialiased}
+:root{--navy:#0A1128;--navy-d:#060c1a;--prata:#B4B5B9;--prata-d:#7a7b7f;--prata-l:#D8D9DC;--off:#F5F4F0;--off2:#ECEAE5;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Montserrat',Arial,sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--off);color:#111;-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}
-.nav{position:fixed;top:0;left:0;right:0;z-index:999;height:72px;background:rgba(6,12,26,0.97);border-bottom:1px solid rgba(180,181,185,0.15);backdrop-filter:blur(16px)}
+.nav{position:fixed;top:0;left:0;right:0;z-index:999;height:72px;background:rgba(6,12,26,.97);border-bottom:1px solid rgba(180,181,185,.15);backdrop-filter:blur(16px)}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;height:100%;max-width:1280px;margin:0 auto;padding:0 48px}
-.nav-logo-name{font-family:var(--serif);font-size:17px;font-weight:300;letter-spacing:5px;color:#fff}
-.nav-cta{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;background:#fff;color:var(--navy);padding:12px 24px}
+.nav-logo{font-family:var(--serif);font-size:17px;font-weight:300;letter-spacing:5px;color:#fff}
+.nav-links{display:flex}
+.nav-link{font-size:9.5px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.65);padding:0 14px;height:72px;display:flex;align-items:center;transition:color .2s}
+.nav-link:hover,.nav-link.ativo{color:#fff}
+.nav-cta{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;background:#fff;color:var(--navy);padding:12px 24px;white-space:nowrap}
 .wrap{max-width:1280px;margin:0 auto;padding:0 48px}
-.hero{background:var(--navy-d);padding:140px 0 100px}
-.hero h1{font-family:var(--serif);font-size:clamp(44px,5.5vw,72px);font-weight:300;color:#fff;line-height:1.08;letter-spacing:-1px}
-.hero h1 em{font-style:italic;color:var(--prata)}
-.hero p{font-size:14px;font-weight:300;color:rgba(180,181,185,.65);margin-top:20px;line-height:1.85;max-width:560px}
-.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:#D8D9DC;margin:64px 0}
-.blog-card{background:#fff;padding:44px 40px}
+.hero{background:var(--navy-d);padding:140px 0 88px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(180,181,185,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(180,181,185,.03) 1px,transparent 1px);background-size:72px 72px}
+.hero-inner{position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:0 48px}
+.breadcrumb{font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:rgba(180,181,185,.4);margin-bottom:28px}
+.breadcrumb a{color:rgba(180,181,185,.4)}
+.hero h1{font-family:var(--serif);font-size:clamp(44px,5.5vw,72px);font-weight:300;color:#fff;line-height:1.08;margin-bottom:20px}
+.hero h1 em{font-style:italic;color:var(--prata);display:block}
+.hero-desc{font-size:14px;font-weight:300;color:rgba(180,181,185,.65);line-height:1.85;max-width:560px}
+.filtros{background:#fff;border-bottom:1px solid var(--off2);position:sticky;top:72px;z-index:99}
+.filtros-inner{max-width:1280px;margin:0 auto;padding:0 48px;display:flex;overflow-x:auto;scrollbar-width:none}
+.filtros-inner::-webkit-scrollbar{display:none}
+.filtro-btn{font-size:9.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:18px 18px;border:none;background:transparent;cursor:pointer;color:var(--prata-d);border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+.filtro-btn:hover{color:var(--navy)}
+.filtro-btn.ativo{color:var(--navy);border-bottom-color:var(--navy)}
+.blog-section{padding:64px 0 80px}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--prata-l)}
+.blog-card{background:#fff;padding:44px 40px;display:flex;flex-direction:column;transition:box-shadow .25s}
+.blog-card:hover{box-shadow:0 4px 24px rgba(0,0,0,.08);z-index:1;position:relative}
+.blog-card.oculto{display:none}
+.blog-card.destaque{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;padding:64px}
 .blog-cat{font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--prata);margin-bottom:16px}
-.blog-titulo{font-family:var(--serif);font-size:24px;font-weight:400;color:var(--navy);line-height:1.25;margin-bottom:16px}
-.blog-resumo{font-size:12.5px;font-weight:300;color:var(--prata-d);line-height:1.8;margin-bottom:24px}
-.blog-link{font-size:9.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--navy);display:inline-flex;align-items:center;gap:8px;border-bottom:1px solid rgba(10,17,40,.2);padding-bottom:2px}
-.em-breve{background:var(--off2);padding:64px;text-align:center;margin:0 48px 100px}
-.em-breve h3{font-family:var(--serif);font-size:32px;font-weight:300;color:var(--navy);margin-bottom:16px}
-.em-breve p{font-size:13px;color:var(--prata-d);max-width:480px;margin:0 auto 32px;line-height:1.8}
-.btn{font-size:9.5px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;background:var(--navy);color:#fff;padding:16px 36px;display:inline-block}
-.footer{background:#000;padding:44px 0 32px;text-align:center}
-.footer p{font-size:10px;color:rgba(180,181,185,.25)}
+.blog-titulo{font-family:var(--serif);font-size:clamp(20px,1.8vw,26px);font-weight:400;color:var(--navy);line-height:1.25;margin-bottom:14px;flex:1}
+.blog-card.destaque .blog-titulo{font-size:clamp(28px,3vw,42px)}
+.blog-resumo{font-size:12.5px;font-weight:300;color:var(--prata-d);line-height:1.8;margin-bottom:28px}
+.blog-card.destaque .blog-resumo{font-size:13.5px;line-height:1.9}
+.blog-link{font-size:9.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--navy);display:inline-flex;align-items:center;gap:10px;border-bottom:1px solid rgba(10,17,40,.2);padding-bottom:3px;transition:gap .2s;align-self:flex-start}
+.blog-link:hover{gap:16px}
+.destaque-visual{background:var(--navy-d);height:280px;display:flex;align-items:center;justify-content:center}
+.destaque-num{font-family:var(--serif);font-size:100px;font-weight:300;color:rgba(180,181,185,.07);line-height:1;text-align:center}
+.mais-wrap{text-align:center;padding:56px 0 80px}
+.btn-mais{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;background:transparent;color:var(--navy);border:1.5px solid var(--navy);padding:18px 52px;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:12px}
+.btn-mais:hover{background:var(--navy);color:#fff}
+.btn-mais.esgotado{display:none}
+.mais-contador{font-size:11px;color:var(--prata);margin-top:16px}
+.cta-blog{background:var(--navy-d);padding:96px 0;text-align:center}
+.cta-blog h2{font-family:var(--serif);font-size:clamp(36px,4vw,56px);font-weight:300;color:#fff;margin-bottom:16px}
+.cta-blog h2 em{font-style:italic;color:var(--prata)}
+.cta-blog p{font-size:14px;font-weight:300;color:rgba(180,181,185,.6);max-width:480px;margin:0 auto 40px;line-height:1.85}
+.btn-w{display:inline-flex;align-items:center;gap:10px;font-size:9.5px;font-weight:600;letter-spacing:3px;text-transform:uppercase;background:#fff;color:var(--navy);padding:17px 36px}
+.footer{background:#000;padding:44px 0 32px}
+.footer-inner{max-width:1280px;margin:0 auto;padding:0 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-nome{font-family:var(--serif);font-size:16px;font-weight:300;color:#fff;letter-spacing:4px}
+.footer-links{display:flex;gap:24px;flex-wrap:wrap}
+.footer-link{font-size:11px;font-weight:300;color:rgba(180,181,185,.5)}
+.footer-link:hover{color:#fff}
+.footer-bottom{max-width:1280px;margin:32px auto 0;padding:24px 48px 0;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:10px;color:rgba(180,181,185,.2)}
 .wpp{position:fixed;bottom:28px;right:28px;z-index:998}
 .wpp a{width:54px;height:54px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(37,211,102,.28)}
-@media(max-width:900px){.wrap{padding:0 24px}.blog-grid{grid-template-columns:1fr}.em-breve{margin:0 24px 64px}}
+@media(max-width:1024px){.blog-card.destaque{grid-column:1;display:flex;flex-direction:column}.destaque-visual{display:none}}
+@media(max-width:900px){.wrap,.hero-inner,.filtros-inner,.footer-inner{padding-left:24px;padding-right:24px}.blog-grid{grid-template-columns:1fr 1fr}.nav-links{display:none}}
+@media(max-width:600px){.blog-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P9KH9B2W" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <nav class="nav">
   <div class="nav-inner">
-    <a href="/"><span class="nav-logo-name">Balneário Hair Institute</span></a>
+    <a href="/" class="nav-logo">Balneário Hair Institute</a>
+    <div class="nav-links">
+      <a href="/transplante-capilar/" class="nav-link">Técnicas</a>
+      <a href="/resultados/" class="nav-link">Resultados</a>
+      <a href="/#portal" class="nav-link">Diagnóstico</a>
+      <a href="/sobre/" class="nav-link">A Clínica</a>
+      <a href="/depoimentos/" class="nav-link">Depoimentos</a>
+      <a href="/blog/" class="nav-link ativo">Blog</a>
+    </div>
     <a href="/#portal" class="nav-cta">Diagnóstico Gratuito</a>
   </div>
 </nav>
-
-<section class="hero" style="padding-top:140px;padding-bottom:100px">
-  <div class="wrap">
-    <div style="font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(180,181,185,.4);margin-bottom:24px">
-      <a href="/" style="color:rgba(180,181,185,.4)">Início</a> / Blog
-    </div>
+<section class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb"><a href="/">Início</a> / Blog</div>
     <h1>Blog sobre<br><em>Transplante Capilar</em></h1>
-    <p>Artigos técnicos e educativos sobre calvície, técnicas cirúrgicas, pós-operatório e saúde capilar masculina — escritos pelo corpo clínico do Balneário Hair Institute.</p>
+    <p class="hero-desc">Artigos técnicos e educativos sobre calvície, técnicas cirúrgicas, pós-operatório e saúde capilar masculina — elaborados pelo corpo clínico do Balneário Hair Institute.</p>
   </div>
 </section>
-
-<div class="wrap">
-  <div class="blog-grid">
-    <article class="blog-card">
-      <div class="blog-cat">Técnicas</div>
-      <h2 class="blog-titulo">FUE Sapphire vs. DHI Choi: qual técnica é ideal para o seu caso?</h2>
-      <p class="blog-resumo">As duas técnicas mais avançadas do mundo em transplante capilar têm indicações diferentes. Entenda como o corpo clínico determina a melhor opção para cada perfil.</p>
-      <span class="blog-link">Em breve →</span>
-    </article>
-    <article class="blog-card">
-      <div class="blog-cat">Pós-Operatório</div>
-      <h2 class="blog-titulo">Os primeiros 30 dias após o transplante capilar: o que esperar</h2>
-      <p class="blog-resumo">Guia completo sobre o choque folicular, os cuidados diários, as restrições e os marcos de recuperação nos primeiros meses após o procedimento.</p>
-      <span class="blog-link">Em breve →</span>
-    </article>
-    <article class="blog-card">
-      <div class="blog-cat">Calvície</div>
-      <h2 class="blog-titulo">Escala Norwood: como classificar a calvície e o que isso significa para o transplante</h2>
-      <p class="blog-resumo">A Escala Norwood é o padrão clínico para avaliar o grau de calvície masculina. Entenda como funciona e como ela define o planejamento cirúrgico.</p>
-      <span class="blog-link">Em breve →</span>
-    </article>
-    <article class="blog-card">
-      <div class="blog-cat">Balneário Camboriú</div>
-      <h2 class="blog-titulo">Por que Balneário Camboriú se tornou o polo de transplante capilar do Sul do Brasil?</h2>
-      <p class="blog-resumo">Localização estratégica, infraestrutura de alto padrão e clínicas especializadas fazem de Balneário Camboriú o destino preferido para quem busca excelência no procedimento.</p>
-      <span class="blog-link">Em breve →</span>
-    </article>
-    <article class="blog-card">
-      <div class="blog-cat">Resultados</div>
-      <h2 class="blog-titulo">Quanto tempo dura o resultado de um transplante capilar?</h2>
-      <p class="blog-resumo">O resultado é permanente — mas há nuances importantes a entender sobre a queda natural dos outros fios e como preservar o resultado a longo prazo.</p>
-      <span class="blog-link">Em breve →</span>
-    </article>
-    <article class="blog-card">
-      <div class="blog-cat">Saúde Capilar</div>
-      <h2 class="blog-titulo">Finasterida e Minoxidil: o papel dos medicamentos antes e depois do transplante</h2>
-      <p class="blog-resumo">Medicamentos para queda capilar podem ser importantes aliados do transplante. Entenda quando são indicados e qual o protocolo adotado pelo Balneário Hair Institute.</p>
-      <span class="blog-link">Em breve →</span>
-    </article>
+<nav class="filtros">
+  <div class="filtros-inner">
+    <button class="filtro-btn ativo" onclick="filtrar('todos',this)">Todos (29)</button>
+    <button class="filtro-btn" onclick="filtrar('tecnicas',this)">Técnicas Cirúrgicas</button>
+    <button class="filtro-btn" onclick="filtrar('calvicie',this)">Calvície</button>
+    <button class="filtro-btn" onclick="filtrar('pos-operatorio',this)">Pós-Operatório</button>
+    <button class="filtro-btn" onclick="filtrar('resultados',this)">Resultados</button>
+    <button class="filtro-btn" onclick="filtrar('planejamento',this)">Planejamento</button>
+    <button class="filtro-btn" onclick="filtrar('balneario',this)">Balneário Camboriú</button>
   </div>
-</div>
-
-<div class="em-breve">
-  <h3>Artigos completos chegando em breve.</h3>
-  <p>Nosso time está produzindo conteúdo técnico e aprofundado sobre transplante capilar. Enquanto isso, inicie seu diagnóstico gratuito por inteligência artificial.</p>
-  <a href="/#portal" class="btn">Iniciar Diagnóstico Gratuito</a>
-</div>
-
+</nav>
+<section class="blog-section">
+  <div class="wrap">
+    <div class="blog-grid" id="blog-grid">
+      <article class="blog-card destaque" data-cat="balneario">
+        <div>
+          <div class="blog-cat">Guia Completo · Balneário Camboriú</div>
+          <h2 class="blog-titulo">Transplante Capilar em Balneário Camboriú — Guia Completo 2026</h2>
+          <p class="blog-resumo">Balneário Camboriú consolidou-se como o principal polo de transplante capilar de alto padrão do Sul do Brasil. Entenda por quê, quais técnicas estão disponíveis e como funciona o processo passo a passo.</p>
+          <a href="/blog/transplante-capilar-balneario-camboriu/" class="blog-link">Ler artigo completo →</a>
+        </div>
+        <div class="destaque-visual"><div class="destaque-num">Balneário<br>Hair<br>Institute</div></div>
+      </article>
+      <article class="blog-card" data-cat="tecnicas">
+        <div class="blog-cat">Técnicas Cirúrgicas</div>
+        <h2 class="blog-titulo">FUE Sapphire: o que é, como funciona e suas vantagens</h2>
+        <p class="blog-resumo">Entenda a técnica FUE Sapphire com lâmina de safira, suas vantagens sobre o FUE convencional e por que alcança viabilidade de até 97% dos enxertos.</p>
+        <a href="/blog/transplante-capilar-fue-sapphire/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card" data-cat="tecnicas">
+        <div class="blog-cat">Técnicas Cirúrgicas</div>
+        <h2 class="blog-titulo">DHI Choi: implantação direta sem abertura de canais</h2>
+        <p class="blog-resumo">A caneta Choi permite implantação folicular com controle milimétrico de ângulo e direção — ideal para hairline design de excepcional naturalidade.</p>
+        <a href="/blog/transplante-capilar-dhi-choi/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card" data-cat="tecnicas">
+        <div class="blog-cat">Técnicas Cirúrgicas</div>
+        <h2 class="blog-titulo">FUE vs DHI: qual técnica de transplante capilar escolher?</h2>
+        <p class="blog-resumo">As diferenças entre FUE Sapphire e DHI Choi, indicações de cada técnica e como o cirurgião decide qual é melhor para o seu caso específico.</p>
+        <a href="/blog/diferenca-fue-dhi-transplante/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card" data-cat="calvicie">
+        <div class="blog-cat">Calvície</div>
+        <h2 class="blog-titulo">Escala Norwood: os graus de calvície e o que significam</h2>
+        <p class="blog-resumo">O sistema de classificação mais usado mundialmente para calvície masculina — entenda os 7 graus e o que cada um implica para o planejamento cirúrgico.</p>
+        <a href="/blog/escala-norwood-calvicie/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card" data-cat="calvicie">
+        <div class="blog-cat">Calvície</div>
+        <h2 class="blog-titulo">Calvície masculina: causas, tratamentos e quando agir</h2>
+        <p class="blog-resumo">Por que os homens ficam calvos, quais tratamentos realmente funcionam e quando o transplante capilar é a solução definitiva para a calvície androgenética.</p>
+        <a href="/blog/calvicie-masculina-tratamento/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card" data-cat="resultados">
+        <div class="blog-cat">Resultados</div>
+        <h2 class="blog-titulo">Transplante capilar é permanente? Quanto tempo dura?</h2>
+        <p class="blog-resumo">A resposta fundamentada em décadas de literatura científica: por que os fios transplantados não caem e o que acontece com o resultado ao longo dos anos.</p>
+        <a href="/blog/transplante-capilar-resultado-permanente/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card" data-cat="planejamento">
+        <div class="blog-cat">Planejamento</div>
+        <h2 class="blog-titulo">Quantos enxertos preciso para o meu transplante capilar?</h2>
+        <p class="blog-resumo">Como calcular o número ideal de enxertos: fatores que determinam a quantidade, estimativas por grau Norwood e o que limita o número por sessão.</p>
+        <a href="/blog/enxertos-capilares-quantos-preciso/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card" data-cat="resultados">
+        <div class="blog-cat">Resultados</div>
+        <h2 class="blog-titulo">Quanto tempo para ver o resultado do transplante capilar?</h2>
+        <p class="blog-resumo">Semana a semana, mês a mês: o que acontece desde o procedimento até o resultado final definitivo aos 12-14 meses.</p>
+        <a href="/blog/transplante-capilar-tempo-resultado/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="pos-operatorio">
+        <div class="blog-cat">Pós-Operatório</div>
+        <h2 class="blog-titulo">Choque folicular: por que os fios caem após o transplante</h2>
+        <p class="blog-resumo">Por que os fios transplantados caem nas primeiras semanas e por que isso é absolutamente normal e esperado em 90-95% dos pacientes.</p>
+        <a href="/blog/choque-folicular-transplante/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="pos-operatorio">
+        <div class="blog-cat">Pós-Operatório</div>
+        <h2 class="blog-titulo">Pós-operatório do transplante capilar: guia semana a semana</h2>
+        <p class="blog-resumo">Tudo que você precisa fazer nos primeiros dias, semanas e meses após o transplante para proteger os enxertos e maximizar o resultado final.</p>
+        <a href="/blog/pos-operatorio-transplante-capilar/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="pos-operatorio">
+        <div class="blog-cat">Pós-Operatório</div>
+        <h2 class="blog-titulo">Cuidados pós-transplante capilar: como proteger seus enxertos</h2>
+        <p class="blog-resumo">Como lavar o cabelo corretamente, alimentação ideal, medicamentos e o cronograma completo de retorno às atividades cotidianas.</p>
+        <a href="/blog/cuidados-pos-transplante-capilar/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="pos-operatorio">
+        <div class="blog-cat">Pós-Operatório</div>
+        <h2 class="blog-titulo">Recuperação do transplante capilar: o que esperar dia a dia</h2>
+        <p class="blog-resumo">Dor, edema, crostas, quando retornar ao trabalho e às atividades físicas — descritos com precisão clínica para que você saiba o que virá.</p>
+        <a href="/blog/recuperacao-transplante-capilar/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="tecnicas">
+        <div class="blog-cat">Técnicas Cirúrgicas</div>
+        <h2 class="blog-titulo">Transplante capilar é seguro? Riscos e como minimizá-los</h2>
+        <p class="blog-resumo">O que a literatura médica diz sobre a segurança do transplante capilar, quais riscos existem e como o protocolo do BHI os minimiza.</p>
+        <a href="/blog/transplante-capilar-seguro/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="calvicie">
+        <div class="blog-cat">Calvície</div>
+        <h2 class="blog-titulo">Finasterida e Minoxidil junto com transplante capilar</h2>
+        <p class="blog-resumo">Como os medicamentos para calvície complementam o transplante, quando são indicados e como potencializam o resultado a longo prazo.</p>
+        <a href="/blog/finasterida-minoxidil-transplante/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="tecnicas">
+        <div class="blog-cat">Técnicas Cirúrgicas</div>
+        <h2 class="blog-titulo">Design da linha frontal: a arte do transplante capilar</h2>
+        <p class="blog-resumo">Como o cirurgião projeta a linha frontal ideal para cada rosto e quais técnicas garantem um resultado completamente natural.</p>
+        <a href="/blog/transplante-capilar-linha-frontal/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="planejamento">
+        <div class="blog-cat">Planejamento</div>
+        <h2 class="blog-titulo">Área doadora: o recurso mais precioso do transplante capilar</h2>
+        <p class="blog-resumo">O que é a zona doadora, por que é resistente à calvície, quantos enxertos pode fornecer e como preservá-la para sessões futuras.</p>
+        <a href="/blog/area-doadora-transplante-capilar/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="calvicie">
+        <div class="blog-cat">Calvície</div>
+        <h2 class="blog-titulo">Calvície hereditária: o que realmente funciona no tratamento</h2>
+        <p class="blog-resumo">A genética da calvície masculina, os tratamentos clinicamente comprovados e quando o transplante capilar é a solução mais eficaz e definitiva.</p>
+        <a href="/blog/calvicie-hereditaria-tratamento/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="tecnicas">
+        <div class="blog-cat">Técnicas Cirúrgicas</div>
+        <h2 class="blog-titulo">Transplante de barba e bigode: como funciona e para quem</h2>
+        <p class="blog-resumo">O procedimento que permite restaurar a barba com o mesmo nível de naturalidade e permanência do transplante capilar convencional.</p>
+        <a href="/blog/transplante-capilar-barba/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="planejamento">
+        <div class="blog-cat">Planejamento</div>
+        <h2 class="blog-titulo">Segunda sessão de transplante capilar: quando é necessária?</h2>
+        <p class="blog-resumo">As razões clínicas para uma segunda sessão, o intervalo mínimo entre procedimentos e como o planejamento inicial evita a necessidade de retorno.</p>
+        <a href="/blog/transplante-capilar-segunda-sessao/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="tecnicas">
+        <div class="blog-cat">Técnicas Cirúrgicas</div>
+        <h2 class="blog-titulo">Transplante capilar sem cicatriz: FUE e DHI explicados</h2>
+        <p class="blog-resumo">Como as técnicas FUE e DHI eliminam a cicatriz linear e por que é possível raspar o cabelo após o procedimento sem marcas visíveis.</p>
+        <a href="/blog/transplante-capilar-sem-cicatriz/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="balneario">
+        <div class="blog-cat">Balneário Camboriú</div>
+        <h2 class="blog-titulo">Como viajar para fazer o transplante em Balneário Camboriú</h2>
+        <p class="blog-resumo">Guia prático para quem vem de outra cidade: quando chegar, onde ficar, quando voltar e como cuidar do pós-operatório na viagem de retorno.</p>
+        <a href="/blog/transplante-capilar-voo-viagem/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="balneario">
+        <div class="blog-cat">Balneário Camboriú</div>
+        <h2 class="blog-titulo">Balneário Camboriú: o polo de saúde premium do Sul do Brasil</h2>
+        <p class="blog-resumo">O fenômeno que transformou Balneário Camboriú no destino de referência para procedimentos eletivos de alto padrão em toda a região Sul.</p>
+        <a href="/blog/balneario-camboriu-polo-saude/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="planejamento">
+        <div class="blog-cat">Planejamento</div>
+        <h2 class="blog-titulo">Trichoscopia: o exame que transforma o diagnóstico capilar</h2>
+        <p class="blog-resumo">Como a microscopia digital do couro cabeludo mapeia a densidade folicular e por que é indispensável antes de qualquer planejamento cirúrgico.</p>
+        <a href="/blog/trichoscopia-diagnostico-capilar/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="planejamento">
+        <div class="blog-cat">Planejamento</div>
+        <h2 class="blog-titulo">Qual a idade mínima para fazer o transplante capilar?</h2>
+        <p class="blog-resumo">Por que a estabilidade da calvície importa mais do que a idade cronológica e como o médico avalia o momento certo para indicar o procedimento.</p>
+        <a href="/blog/transplante-capilar-idade-minima/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="planejamento">
+        <div class="blog-cat">Planejamento</div>
+        <h2 class="blog-titulo">Transplante capilar no inverno ou verão: qual é melhor?</h2>
+        <p class="blog-resumo">Existe uma estação ideal para o procedimento? Entenda as considerações de cada época do ano e o que realmente impacta no resultado.</p>
+        <a href="/blog/transplante-capilar-inverno-verao/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="balneario">
+        <div class="blog-cat">Balneário Camboriú</div>
+        <h2 class="blog-titulo">Transplante capilar no Sul do Brasil: como escolher com segurança</h2>
+        <p class="blog-resumo">O que diferencia as clínicas especializadas, quais critérios usar na escolha e por que Balneário Camboriú se destaca na região Sul do país.</p>
+        <a href="/blog/transplante-capilar-sul-brasil/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="calvicie">
+        <div class="blog-cat">Calvície</div>
+        <h2 class="blog-titulo">Alopecia androgenética: o papel dos hormônios na calvície</h2>
+        <p class="blog-resumo">O mecanismo hormonal por trás da calvície masculina: como o DHT miniaturiza os folículos e por que o transplante oferece resultado permanente.</p>
+        <a href="/blog/calvicie-androgens-alopecia/" class="blog-link">Ler artigo →</a>
+      </article>
+      <article class="blog-card oculto" data-cat="resultados">
+        <div class="blog-cat">Resultados</div>
+        <h2 class="blog-titulo">Transplante capilar em famosos: o que os resultados revelam</h2>
+        <p class="blog-resumo">Por que o transplante capilar deixou de ser tabu e o que os casos públicos ensinam sobre qualidade, naturalidade e excelência técnica.</p>
+        <a href="/blog/transplante-capilar-famosos/" class="blog-link">Ler artigo →</a>
+      </article>
+    </div>
+    <div class="mais-wrap">
+      <button class="btn-mais" id="btn-mais" onclick="carregarMais()">↓ &nbsp; Ver mais artigos</button>
+      <p class="mais-contador" id="mais-contador">Mostrando 9 de 29 artigos</p>
+    </div>
+  </div>
+</section>
+<section class="cta-blog">
+  <div class="wrap">
+    <h2>Pronto para dar o<br><em>próximo passo?</em></h2>
+    <p>Diagnóstico capilar gratuito por inteligência artificial — envie suas fotos e receba o laudo completo por e-mail e WhatsApp.</p>
+    <a href="/#portal" class="btn-w">Iniciar Diagnóstico Gratuito →</a>
+  </div>
+</section>
 <footer class="footer">
-  <p>© 2026 Balneário Hair Institute · Rua Julieta Lins, 330 · Balneário Camboriú, SC · (47) 99249-5146</p>
+  <div class="footer-inner">
+    <div class="footer-nome">Balneário Hair Institute</div>
+    <div class="footer-links">
+      <a href="/transplante-capilar/" class="footer-link">Técnicas</a>
+      <a href="/resultados/" class="footer-link">Resultados</a>
+      <a href="/sobre/" class="footer-link">A Clínica</a>
+      <a href="/depoimentos/" class="footer-link">Depoimentos</a>
+      <a href="/contato/" class="footer-link">Contato</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Balneário Hair Institute · balneariohair.com.br · Todos os direitos reservados</span>
+    <span>CRM-SC · CFM · Resultados individuais podem variar</span>
+  </div>
 </footer>
-
-<div class="wpp">
-  <a href="https://wa.me/5547992495146" aria-label="WhatsApp">
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="white"><path d="M13 2C7.48 2 3 6.48 3 12c0 1.97.57 3.82 1.56 5.38L3 22l4.74-1.52A10 10 0 0 0 13 22c5.52 0 10-4.48 10-10S18.52 2 13 2zm5.2 14.2c-.22.62-1.28 1.18-1.76 1.26-.48.08-1.08.12-1.72-.1a15.7 15.7 0 0 1-1.6-.6c-2.8-1.22-4.62-4.04-4.76-4.24-.14-.2-1.12-1.5-1.12-2.86s.72-2.04.96-2.32c.24-.28.52-.34.7-.34h.5c.16 0 .38-.06.6.46.22.52.74 1.82.8 1.96.06.14.1.32.02.5-.08.18-.12.28-.24.44-.12.16-.26.35-.36.47-.12.14-.24.28-.1.54.14.26.62 1.02 1.34 1.66.92.82 1.7 1.08 1.94 1.2.24.12.38.1.52-.06.14-.16.6-.7.76-.94.16-.24.32-.2.54-.12.22.08 1.4.66 1.64.78.24.12.4.18.46.28.06.1.06.56-.16 1.18z"/></svg>
-  </a>
-</div>
-<script src="/diagnostic-modal.js" defer></script>
+<div class="wpp"><a href="https://wa.me/5547992495146" aria-label="WhatsApp"><svg width="26" height="26" viewBox="0 0 26 26" fill="white"><path d="M13 2C7.48 2 3 6.48 3 12c0 1.97.57 3.82 1.56 5.38L3 22l4.74-1.52A10 10 0 0 0 13 22c5.52 0 10-4.48 10-10S18.52 2 13 2zm5.2 14.2c-.22.62-1.28 1.18-1.76 1.26-.48.08-1.08.12-1.72-.1a15.7 15.7 0 0 1-1.6-.6c-2.8-1.22-4.62-4.04-4.76-4.24-.14-.2-1.12-1.5-1.12-2.86s.72-2.04.96-2.32c.24-.28.52-.34.7-.34h.5c.16 0 .38-.06.6.46.22.52.74 1.82.8 1.96.06.14.1.32.02.5-.08.18-.12.28-.24.44-.12.16-.26.35-.36.47-.12.14-.24.28-.1.54.14.26.62 1.02 1.34 1.66.92.82 1.7 1.08 1.94 1.2.24.12.38.1.52-.06.14-.16.6-.7.76-.94.16-.24.32-.2.54-.12.22.08 1.4.66 1.64.78.24.12.4.18.46.28.06.1.06.56-.16 1.18z"/></svg></a></div>
+<script>
+let mostrados=9;const total=29;
+function carregarMais(){const ocultos=document.querySelectorAll('.blog-card.oculto');let r=0;ocultos.forEach(c=>{if(r<10){c.classList.remove('oculto');c.style.opacity='0';c.style.transition='opacity .4s ease';setTimeout(()=>c.style.opacity='1',r*50);r++;mostrados++;}});const restam=document.querySelectorAll('.blog-card.oculto').length;document.getElementById('mais-contador').textContent='Mostrando '+mostrados+' de '+total+' artigos';if(restam===0){document.getElementById('btn-mais').classList.add('esgotado');document.getElementById('mais-contador').textContent='Todos os '+total+' artigos carregados ✓';}}
+function filtrar(cat,btn){document.querySelectorAll('.filtro-btn').forEach(b=>b.classList.remove('ativo'));btn.classList.add('ativo');const cards=document.querySelectorAll('.blog-card');let vis=0;if(cat==='todos'){mostrados=9;let i=0;cards.forEach(c=>{c.style.display='';if(i>=9)c.classList.add('oculto');else c.classList.remove('oculto');i++;});document.getElementById('btn-mais').classList.remove('esgotado');document.getElementById('mais-contador').textContent='Mostrando 9 de '+total+' artigos';return;}cards.forEach(c=>{const match=c.dataset.cat===cat;c.style.display=match?'':'none';c.classList.remove('oculto');if(match)vis++;});document.getElementById('btn-mais').classList.add('esgotado');document.getElementById('mais-contador').textContent=vis+' artigo'+(vis!==1?'s':'')+' nesta categoria';}
+</script>
 </body>
 </html>
