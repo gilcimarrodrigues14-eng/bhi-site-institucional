@@ -147,8 +147,8 @@
 .bhi-dx-replay:hover{color:#fff;border-color:#fff}
 .bhi-dx-camera-wrap{position:relative;width:100%;aspect-ratio:1/1;max-height:54vh;background:#000;border-radius:10px;overflow:hidden;margin:6px 0 16px}
 .bhi-dx-preview-img{width:100%;height:100%;object-fit:cover;display:block}
-/* scaleX(-1.6) + scaleY(1.6) = espelhamento + zoom 1.6x via CSS (fallback quando zoom nativo da câmera não é suportado) */
-.bhi-dx-video{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1.6) scaleY(1.6);transform-origin:center center}
+/* scaleX(-1) = só espelhamento (efeito selfie). Sem zoom CSS — preview e foto final ficam no mesmo enquadramento. */
+.bhi-dx-video{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1);transform-origin:center center}
 .bhi-dx-guide{position:absolute;left:15%;top:15%;width:70%;height:70%;pointer-events:none;z-index:5;animation:bhi-dx-guide-pulse 2s ease-in-out infinite}
 @keyframes bhi-dx-guide-pulse{0%,100%{opacity:.6}50%{opacity:1}}
 .bhi-dx-guide-label{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-size:10px;font-weight:600;letter-spacing:.8px;padding:6px 14px;border-radius:14px;text-align:center;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;z-index:6;font-family:'Montserrat',Arial,sans-serif}
@@ -439,7 +439,6 @@
           width: { ideal: 1080 },
           height: { ideal: 1080 },
           aspectRatio: { ideal: 1.0 },
-          advanced: [{ zoom: 2.0 }],
         },
         audio: false,
       })
@@ -447,18 +446,7 @@
         state.stream = stream
         var video = document.getElementById('bhi-dx-video')
         if (video) video.srcObject = stream
-        // Tenta aplicar zoom nativo da câmera se suportado (browsers modernos)
-        try {
-          var track = stream.getVideoTracks()[0]
-          if (track && typeof track.getCapabilities === 'function') {
-            var caps = track.getCapabilities()
-            if (caps && typeof caps.zoom !== 'undefined') {
-              var zoomMax = caps.zoom.max || 4
-              var zoomTarget = Math.min(2.5, zoomMax)
-              track.applyConstraints({ advanced: [{ zoom: zoomTarget }] }).catch(function () {})
-            }
-          }
-        } catch (e) { /* sem zoom nativo — fallback CSS já cuida */ }
+        // Sem zoom nativo — preview e captura no mesmo enquadramento
         return true
       })
       .catch(function (err) {
@@ -491,15 +479,13 @@
     var video = document.getElementById('bhi-dx-video')
     if (!video || !video.videoWidth) return
 
-    // Crop centralizado: descarta 10% horizontal e 5% vertical de cada borda
-    // do frame, garantindo que a foto enviada ao backend foque no rosto/cabeça
-    // mesmo se o preview de câmera estiver mais aberto do que ideal.
+    // Sem crop — preview e foto final no mesmo enquadramento (sem zoom CSS)
     var srcW = video.videoWidth
     var srcH = video.videoHeight
-    var cropX = srcW * 0.10
-    var cropY = srcH * 0.05
-    var cropW = srcW * 0.80
-    var cropH = srcH * 0.90
+    var cropX = 0
+    var cropY = 0
+    var cropW = srcW
+    var cropH = srcH
 
     // Limita resolução final pra não inflar o upload
     var maxOutW = 1080
@@ -580,7 +566,10 @@
       }
       var nitidez = sharpSum / totalPixels
 
-      if (blackRatio > 0.85) {
+      // Validação mínima: só barra fotos claramente inutilizáveis
+      // (câmera tampada, escuridão total, estouro total, ou borrão extremo).
+      // Não busca foto perfeita — só aceitável.
+      if (blackRatio > 0.92) {
         return {
           ok: false,
           tipo: 'PRETA',
@@ -589,39 +578,39 @@
           hint: '',
         }
       }
-      if (avg < 45) {
+      if (avg < 25) {
         return {
           ok: false,
           tipo: 'ESCURA',
           icon: '💡',
-          message: 'Ambiente muito escuro. Aproxime-se de uma fonte de luz ou acenda a luz do ambiente.',
+          message: 'Ambiente muito escuro. Acenda uma luz e tente novamente.',
           hint: '',
         }
       }
-      if (avg > 215) {
+      if (avg > 235) {
         return {
           ok: false,
           tipo: 'CLARA',
           icon: '☀️',
-          message: 'Excesso de luz ou reflexo. Evite luz direta no rosto e afaste-se de janelas.',
+          message: 'Excesso de luz no enquadramento. Afaste-se da luz direta.',
           hint: '',
         }
       }
-      if (nitidez < 8) {
+      if (nitidez < 3) {
         return {
           ok: false,
           tipo: 'DESFOCADA',
           icon: '📷',
-          message: 'Foto desfocada. Mantenha o celular parado por 2 segundos antes de capturar.',
-          hint: 'Apoie o cotovelo em algo firme para estabilizar.',
+          message: 'Foto muito desfocada. Mantenha o celular firme e tente novamente.',
+          hint: '',
         }
       }
-      if (stddev < 12) {
+      if (stddev < 6) {
         return {
           ok: false,
           tipo: 'UNIFORME',
           icon: '✗',
-          message: 'Foto fora do padrão. Certifique-se de que o rosto está enquadrado no guia.',
+          message: 'Imagem sem detalhes suficientes. Aproxime mais o rosto do guia.',
           hint: '',
         }
       }
@@ -649,67 +638,99 @@
     var label = ''
 
     if (idx === 0) {
-      // ── FOTO 1 — Rosto de FRENTE ───────────────────────────────────────────
-      // Oval do rosto, linha do couro cabeludo (arco), entradas laterais,
-      // referência de sobrancelhas, queixo, e marcação das duas orelhas.
-      label = 'CENTRALIZE SEU ROSTO'
+      // ── FOTO 1 — Rosto de FRENTE (molde realista) ──────────────────────────
+      // Rosto frontal completo: contorno do rosto, cabelo, sobrancelhas,
+      // olhos (com pupila), nariz, boca e orelhas.
+      label = 'ENCAIXE SEU ROSTO NO MOLDE'
       svgInner =
-        // Oval do rosto (mais largo no centro, estreitando no queixo)
-        '<path d="M150,80 C100,80 75,140 75,200 C75,260 105,310 150,320 C195,310 225,260 225,200 C225,140 200,80 150,80 Z" ' + STROKE + '/>' +
-        // Linha do couro cabeludo (arco que sobe no centro)
-        '<path d="M85,115 Q150,75 215,115" ' + STROKE_THIN + '/>' +
-        // Entradas laterais (dois recuos)
-        '<path d="M88,118 Q98,128 105,120" ' + STROKE_THIN + '/>' +
-        '<path d="M212,118 Q202,128 195,120" ' + STROKE_THIN + '/>' +
-        // Linha das sobrancelhas
-        '<line x1="95" y1="170" x2="205" y2="170" ' + STROKE_THIN + '/>' +
-        // Linha do queixo
-        '<line x1="115" y1="315" x2="185" y2="315" ' + STROKE_THIN + '/>' +
-        // Pontos de orelha
-        '<circle cx="78" cy="200" r="4" ' + DOT + '/>' +
-        '<circle cx="222" cy="200" r="4" ' + DOT + '/>'
+        // Contorno do rosto (oval que afina no queixo)
+        '<path d="M150,95 C105,95 82,150 82,205 C82,260 108,305 150,325 C192,305 218,260 218,205 C218,150 195,95 150,95 Z" ' + STROKE + '/>' +
+        // Cabelo (arco do couro cabeludo)
+        '<path d="M82,170 C80,120 110,80 150,80 C190,80 220,120 218,170" ' + STROKE_THIN + '/>' +
+        // Orelhas (laterais)
+        '<path d="M82,200 C72,200 68,215 72,230 C76,240 82,238 84,232" ' + STROKE_THIN + '/>' +
+        '<path d="M218,200 C228,200 232,215 228,230 C224,240 218,238 216,232" ' + STROKE_THIN + '/>' +
+        // Sobrancelha esquerda
+        '<path d="M105,178 Q120,170 135,178" ' + STROKE_THIN + '/>' +
+        // Sobrancelha direita
+        '<path d="M165,178 Q180,170 195,178" ' + STROKE_THIN + '/>' +
+        // Olho esquerdo (amêndoa + pupila)
+        '<path d="M105,195 Q120,186 135,195 Q120,204 105,195 Z" ' + STROKE_THIN + '/>' +
+        '<circle cx="120" cy="195" r="3" ' + DOT + '/>' +
+        // Olho direito
+        '<path d="M165,195 Q180,186 195,195 Q180,204 165,195 Z" ' + STROKE_THIN + '/>' +
+        '<circle cx="180" cy="195" r="3" ' + DOT + '/>' +
+        // Nariz
+        '<path d="M150,205 L142,245 Q150,252 158,245 L150,205" ' + STROKE_THIN + '/>' +
+        // Boca
+        '<path d="M128,275 Q150,285 172,275" ' + STROKE_THIN + '/>' +
+        '<path d="M128,275 Q150,268 172,275" ' + STROKE_THIN + '/>'
     } else if (idx === 1) {
-      // ── FOTO 2 — Topo da cabeça (cabeça baixa) ─────────────────────────────
-      // Oval largo arredondado, divisão central (risco), círculo do vértex,
-      // pontos de orelha laterais.
-      label = 'ABAIXE A CABEÇA — TOPO CENTRALIZADO'
+      // ── FOTO 2 — Topo da cabeça (vista de cima, cabeça baixa) ──────────────
+      // Vista superior do crânio: contorno arredondado, orelhas nas laterais,
+      // nariz aparecendo no topo, redemoinho do vértex no centro.
+      label = 'ABAIXE A CABEÇA — VISTA DE CIMA'
       svgInner =
-        // Oval largo do topo da cabeça
-        '<ellipse cx="150" cy="200" rx="115" ry="135" ' + STROKE + '/>' +
-        // Linha de divisão / risco do cabelo
-        '<line x1="150" y1="68" x2="150" y2="200" ' + STROKE_THIN + '/>' +
-        // Círculo da coroa (vértex)
-        '<circle cx="150" cy="200" r="32" ' + STROKE_THIN + '/>' +
-        // Pontos de orelha (extremidades)
-        '<circle cx="38" cy="200" r="5" ' + DOT + '/>' +
-        '<circle cx="262" cy="200" r="5" ' + DOT + '/>'
+        // Contorno do crânio (oval visto de cima — mais redondo)
+        '<ellipse cx="150" cy="200" rx="110" ry="125" ' + STROKE + '/>' +
+        // Orelha esquerda (lateral, "saindo" do crânio)
+        '<path d="M40,200 C28,195 25,210 32,225 C40,235 50,228 52,218" ' + STROKE_THIN + '/>' +
+        // Orelha direita
+        '<path d="M260,200 C272,195 275,210 268,225 C260,235 250,228 248,218" ' + STROKE_THIN + '/>' +
+        // Nariz visível na parte de cima (topo da cabeça inclinada para frente)
+        '<path d="M140,82 Q150,72 160,82 L155,95 Q150,100 145,95 Z" ' + STROKE_THIN + '/>' +
+        // Risco/divisão central do cabelo
+        '<line x1="150" y1="90" x2="150" y2="295" ' + STROKE_THIN + '/>' +
+        // Vértex / redemoinho da coroa (espiral)
+        '<circle cx="150" cy="200" r="38" ' + STROKE_THIN + '/>' +
+        '<circle cx="150" cy="200" r="22" ' + STROKE_THIN + '/>' +
+        '<circle cx="150" cy="200" r="8" ' + STROKE_THIN + '/>' +
+        '<circle cx="150" cy="200" r="2" ' + DOT + '/>'
     } else if (idx === 2) {
-      // ── FOTO 3 — Perfil lateral direito ────────────────────────────────────
-      // Silhueta de rosto em perfil olhando para a direita (do ponto de vista
-      // do espectador), linha do nariz, queixo, pescoço, orelha em forma de C.
-      label = 'LATERAL DIREITA — ORELHA VISÍVEL'
+      // ── FOTO 3 — Perfil lateral DIREITO (rosto vira p/ direita) ────────────
+      // Silhueta de rosto em perfil com nariz, lábios, queixo e orelha visíveis.
+      // O rosto está apontado para a direita do espectador.
+      label = 'VIRE O ROSTO PARA A DIREITA'
       svgInner =
-        // Contorno do rosto em perfil (testa → nariz → boca → queixo → pescoço)
-        '<path d="M115,90 C95,140 100,170 130,180 L155,210 L130,225 L135,260 C140,290 130,310 115,330" ' + STROKE + '/>' +
-        // Topo da cabeça → nuca
-        '<path d="M115,90 C160,70 220,90 230,160 C235,220 215,280 195,320" ' + STROKE_THIN + '/>' +
-        // Pescoço
-        '<line x1="115" y1="330" x2="195" y2="330" ' + STROKE_THIN + '/>' +
-        // Orelha em forma de C
-        '<path d="M195,180 Q210,180 210,200 Q210,220 195,220" ' + STROKE_THIN + '/>' +
-        // Seta indicando direção "olhe para a direita"
-        '<path d="M250,200 L280,200 M270,190 L280,200 L270,210" stroke="rgba(255,255,255,0.85)" stroke-width="2" fill="none"/>'
+        // Contorno do perfil: testa → nariz → filtro → lábios → queixo → pescoço
+        '<path d="M120,100 ' +              // topo da testa
+        'Q108,140 110,170 ' +                // testa descendo
+        'L120,180 ' +                        // entrada do nariz
+        'L165,205 ' +                        // ponta do nariz (saliência)
+        'L130,215 ' +                        // base do nariz volta
+        'L128,230 ' +                        // filtro (acima do lábio)
+        'Q140,238 130,248 ' +                // lábio superior
+        'Q140,258 128,265 ' +                // lábio inferior
+        'L120,285 ' +                        // queixo entrando
+        'L135,310 ' +                        // ponta do queixo
+        'L120,330" ' +                       // pescoço
+        STROKE + '/>' +
+        // Nuca / topo do crânio (atrás)
+        '<path d="M120,100 Q170,75 220,115 Q235,170 225,230 Q210,290 195,325" ' + STROKE_THIN + '/>' +
+        // Linha do pescoço (parte de trás)
+        '<line x1="120" y1="330" x2="195" y2="330" ' + STROKE_THIN + '/>' +
+        // Orelha visível (lateral direita do rosto, fica do lado oposto ao nariz)
+        '<path d="M180,195 Q200,195 200,220 Q200,240 180,240 Q188,225 188,210 Q188,200 180,195 Z" ' + STROKE_THIN + '/>' +
+        '<circle cx="192" cy="218" r="2" ' + DOT + '/>' +
+        // Olho lateral (ponto pequeno após o nariz)
+        '<circle cx="148" cy="195" r="3" ' + DOT + '/>' +
+        // Sobrancelha
+        '<path d="M138,182 Q150,178 160,184" ' + STROKE_THIN + '/>' +
+        // Seta indicando direção
+        '<path d="M250,200 L285,200 M275,190 L285,200 L275,210" stroke="rgba(255,255,255,0.85)" stroke-width="2" fill="none"/>'
     } else {
-      // ── FOTO 4 — Perfil lateral esquerdo ───────────────────────────────────
-      // Mesmo SVG da Foto 3, espelhado horizontalmente (transform scale(-1,1))
-      label = 'LATERAL ESQUERDA — ORELHA VISÍVEL'
+      // ── FOTO 4 — Perfil lateral ESQUERDO (espelhado) ───────────────────────
+      label = 'VIRE O ROSTO PARA A ESQUERDA'
       svgInner =
         '<g transform="translate(300,0) scale(-1,1)">' +
-        '<path d="M115,90 C95,140 100,170 130,180 L155,210 L130,225 L135,260 C140,290 130,310 115,330" ' + STROKE + '/>' +
-        '<path d="M115,90 C160,70 220,90 230,160 C235,220 215,280 195,320" ' + STROKE_THIN + '/>' +
-        '<line x1="115" y1="330" x2="195" y2="330" ' + STROKE_THIN + '/>' +
-        '<path d="M195,180 Q210,180 210,200 Q210,220 195,220" ' + STROKE_THIN + '/>' +
-        '<path d="M250,200 L280,200 M270,190 L280,200 L270,210" stroke="rgba(255,255,255,0.85)" stroke-width="2" fill="none"/>' +
+        '<path d="M120,100 Q108,140 110,170 L120,180 L165,205 L130,215 L128,230 Q140,238 130,248 Q140,258 128,265 L120,285 L135,310 L120,330" ' + STROKE + '/>' +
+        '<path d="M120,100 Q170,75 220,115 Q235,170 225,230 Q210,290 195,325" ' + STROKE_THIN + '/>' +
+        '<line x1="120" y1="330" x2="195" y2="330" ' + STROKE_THIN + '/>' +
+        '<path d="M180,195 Q200,195 200,220 Q200,240 180,240 Q188,225 188,210 Q188,200 180,195 Z" ' + STROKE_THIN + '/>' +
+        '<circle cx="192" cy="218" r="2" ' + DOT + '/>' +
+        '<circle cx="148" cy="195" r="3" ' + DOT + '/>' +
+        '<path d="M138,182 Q150,178 160,184" ' + STROKE_THIN + '/>' +
+        '<path d="M250,200 L285,200 M275,190 L285,200 L275,210" stroke="rgba(255,255,255,0.85)" stroke-width="2" fill="none"/>' +
         '</g>'
     }
     var svg =
