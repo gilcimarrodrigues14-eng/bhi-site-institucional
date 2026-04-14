@@ -104,12 +104,12 @@
 
   // ─── CSS injetado uma única vez ──────────────────────────────────────────────
   var CSS = `
-.bhi-dx-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',Arial,sans-serif;-webkit-font-smoothing:antialiased;animation:bhi-dx-fade 220ms ease}
-.bhi-dx-card{position:relative;background:#0A1128;border-radius:14px;width:min(540px,calc(100vw - 24px));max-height:calc(100vh - 32px);overflow-y:auto;padding:36px 32px 32px;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:bhi-dx-slide 320ms cubic-bezier(.2,.8,.2,1)}
+.bhi-dx-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',Arial,sans-serif;-webkit-font-smoothing:antialiased;animation:bhi-dx-fade 220ms ease}
+.bhi-dx-card{position:relative;background:#0A1128;border-radius:14px;width:min(540px,calc(100vw - 24px));max-height:calc(100vh - 32px);overflow-y:auto;padding:36px 32px 32px;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:bhi-dx-slide 320ms cubic-bezier(.2,.8,.2,1);z-index:10000}
 @keyframes bhi-dx-fade{from{opacity:0}to{opacity:1}}
 @keyframes bhi-dx-slide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.bhi-dx-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:transparent;border:1px solid rgba(180,181,185,.35);color:#B4B5B9;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.bhi-dx-close:hover{background:rgba(180,181,185,.12);color:#fff}
+.bhi-dx-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);border:1px solid rgba(180,181,185,.4);color:#B4B5B9;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:99999;pointer-events:all}
+.bhi-dx-close:hover{background:rgba(180,181,185,.18);color:#fff;border-color:#fff}
 .bhi-dx-h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:400;line-height:1.1;color:#fff;margin:0 0 10px;letter-spacing:-.5px}
 .bhi-dx-sub{font-size:14px;color:#B4B5B9;margin:0 0 22px;line-height:1.5}
 .bhi-dx-instructions{display:flex;gap:14px;margin:18px 0 26px}
@@ -143,6 +143,15 @@
 .bhi-dx-replay:hover{color:#fff;border-color:#fff}
 .bhi-dx-camera-wrap{position:relative;width:100%;aspect-ratio:3/4;max-height:48vh;background:#000;border-radius:10px;overflow:hidden;margin:6px 0 16px}
 .bhi-dx-video,.bhi-dx-preview-img{width:100%;height:100%;object-fit:cover;display:block}
+.bhi-dx-video{transform:scaleX(-1)}
+.bhi-dx-guide{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+.bhi-dx-guide-label{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);color:#fff;font-size:11px;letter-spacing:.5px;padding:6px 12px;border-radius:14px;text-align:center;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis}
+.bhi-dx-preview-img.is-ok{outline:3px solid #1D9E75;outline-offset:-3px}
+.bhi-dx-preview-img.is-warn{outline:3px solid #EF9F27;outline-offset:-3px}
+.bhi-dx-validation{margin:-8px 0 10px;padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.45;display:flex;gap:8px;align-items:flex-start}
+.bhi-dx-validation.is-ok{background:rgba(29,158,117,.12);border:1px solid rgba(29,158,117,.4);color:#7fe0b6}
+.bhi-dx-validation.is-warn{background:rgba(239,159,39,.12);border:1px solid rgba(239,159,39,.45);color:#ffd596}
+.bhi-dx-validation-icon{flex-shrink:0;font-size:14px;line-height:1}
 .bhi-dx-camera-error{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;color:#B4B5B9;font-size:13px;text-align:center;line-height:1.5}
 .bhi-dx-shutter{display:flex;justify-content:center;margin:0 0 12px}
 .bhi-dx-shutter-btn{width:64px;height:64px;border-radius:50%;background:#fff;border:4px solid rgba(255,255,255,.3);cursor:pointer;transition:transform .15s;padding:0}
@@ -193,8 +202,10 @@
     rootEl.innerHTML = ''
     var overlay = document.createElement('div')
     overlay.className = 'bhi-dx-overlay'
+    // Loading é o único estado onde fechar é bloqueado — sucesso/erro permitem.
+    var isLoadingStep = state.step === 4 && state._success === null
     overlay.addEventListener('click', function (e) {
-      if (e.target === overlay && state.step !== 4) closeModal()
+      if (e.target === overlay && !isLoadingStep) closeModal()
     })
 
     var card = document.createElement('div')
@@ -202,7 +213,7 @@
     card.setAttribute('role', 'dialog')
     card.setAttribute('aria-modal', 'true')
 
-    if (state.step !== 4) {
+    if (!isLoadingStep) {
       var closeBtn = document.createElement('button')
       closeBtn.className = 'bhi-dx-close'
       closeBtn.type = 'button'
@@ -250,10 +261,12 @@
     state.step = 2
     state.fotoIndex = 0
     state.fotos = [null, null, null, null]
+    state.validacoes = [null, null, null, null]
     render()
-    startCamera().then(function (ok) {
-      if (ok) falarInstrucao(FOTOS[0].instrucao)
-    })
+    // Dispara áudio imediatamente dentro da mesma tarefa síncrona do clique
+    // para não ser bloqueado pela política de autoplay em mobile.
+    falarInstrucao(FOTOS[0].instrucao)
+    startCamera()
   }
 
   // ─── Step 2: Camera + 4 captures ─────────────────────────────────────────────
@@ -286,15 +299,28 @@
     }
 
     var capturedBlob = state.fotos[state.fotoIndex]
+    var validation = (state.validacoes && state.validacoes[state.fotoIndex]) || null
+    var imgClass = 'bhi-dx-preview-img'
+    if (validation) imgClass += validation.ok ? ' is-ok' : ' is-warn'
     html += '<div class="bhi-dx-camera-wrap">'
     if (capturedBlob) {
       var url = URL.createObjectURL(capturedBlob)
-      html += '<img src="' + url + '" class="bhi-dx-preview-img" alt="Foto capturada">'
+      html += '<img src="' + url + '" class="' + imgClass + '" alt="Foto capturada">'
     } else {
       html += '<video class="bhi-dx-video" id="bhi-dx-video" autoplay playsinline muted></video>'
+      html += guideSvgHtml(state.fotoIndex)
       html += '<div class="bhi-dx-camera-error" id="bhi-dx-camera-error" style="display:none"></div>'
     }
     html += '</div>'
+
+    if (validation) {
+      var vCls = validation.ok ? 'is-ok' : 'is-warn'
+      var vIcon = validation.ok ? '✓' : '⚠'
+      html += '<div class="bhi-dx-validation ' + vCls + '">'
+      html += '<span class="bhi-dx-validation-icon">' + vIcon + '</span>'
+      html += '<span>' + validation.message + '</span>'
+      html += '</div>'
+    }
 
     if (!capturedBlob) {
       html += '<div class="bhi-dx-shutter"><button type="button" class="bhi-dx-shutter-btn" id="bhi-dx-shutter" aria-label="Capturar foto"></button></div>'
@@ -302,7 +328,8 @@
       html += '<div class="bhi-dx-actions">'
       html += '<button type="button" class="bhi-dx-btn bhi-dx-btn-secondary" id="bhi-dx-retake">Refazer</button>'
       var nextLabel = state.fotoIndex === FOTOS.length - 1 ? 'Continuar' : 'Próxima foto'
-      html += '<button type="button" class="bhi-dx-btn bhi-dx-btn-primary" id="bhi-dx-next">' + nextLabel + '</button>'
+      var nextDisabled = validation && !validation.ok ? ' disabled' : ''
+      html += '<button type="button" class="bhi-dx-btn bhi-dx-btn-primary" id="bhi-dx-next"' + nextDisabled + '>' + nextLabel + '</button>'
       html += '</div>'
     }
 
@@ -324,6 +351,7 @@
       var retake = document.getElementById('bhi-dx-retake')
       if (retake) retake.addEventListener('click', function () {
         state.fotos[state.fotoIndex] = null
+        if (state.validacoes) state.validacoes[state.fotoIndex] = null
         render()
         // re-attach stream
         var v = document.getElementById('bhi-dx-video')
@@ -333,6 +361,8 @@
 
       var next = document.getElementById('bhi-dx-next')
       if (next) next.addEventListener('click', function () {
+        var curVal = state.validacoes && state.validacoes[state.fotoIndex]
+        if (curVal && !curVal.ok) return
         if (state.fotoIndex === FOTOS.length - 1) {
           stopCamera()
           state.step = 3
@@ -355,7 +385,7 @@
       return Promise.resolve(false)
     }
     return navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false })
+      .getUserMedia({ video: { facingMode: 'user' }, audio: false })
       .then(function (stream) {
         state.stream = stream
         var video = document.getElementById('bhi-dx-video')
@@ -399,13 +429,104 @@
     canvas.width = w
     canvas.height = h
     var ctx = canvas.getContext('2d')
+    // IMPORTANTE: não espelhamos o canvas — o preview é espelhado só via CSS
+    // para UX de selfie, mas a imagem enviada ao backend fica na orientação real.
     ctx.drawImage(video, 0, 0, w, h)
+    var validation = validatePhoto(ctx, w, h)
     canvas.toBlob(function (blob) {
       if (!blob) return
       state.fotos[state.fotoIndex] = blob
+      if (!state.validacoes) state.validacoes = [null, null, null, null]
+      state.validacoes[state.fotoIndex] = validation
       pararFala()
       render()
     }, 'image/jpeg', 0.85)
+  }
+
+  // ─── Validação de qualidade da foto (client-side) ───────────────────────────
+  function validatePhoto(ctx, w, h) {
+    try {
+      // Amostragem 1 em cada 4x4 pixels (reduz custo sem perder precisão útil)
+      var step = 4
+      var img = ctx.getImageData(0, 0, w, h)
+      var data = img.data
+      var total = 0
+      var sum = 0
+      var blackish = 0
+      var lumas = []
+      for (var y = 0; y < h; y += step) {
+        for (var x = 0; x < w; x += step) {
+          var i = (y * w + x) * 4
+          var r = data[i]
+          var g = data[i + 1]
+          var b = data[i + 2]
+          var luma = r * 0.299 + g * 0.587 + b * 0.114
+          sum += luma
+          lumas.push(luma)
+          if (r < 10 && g < 10 && b < 10) blackish++
+          total++
+        }
+      }
+      if (total === 0) return { ok: true, message: 'Foto registrada com sucesso' }
+      var avg = sum / total
+      // Desvio padrão
+      var varSum = 0
+      for (var k = 0; k < lumas.length; k++) {
+        var d = lumas[k] - avg
+        varSum += d * d
+      }
+      var stddev = Math.sqrt(varSum / total)
+      var blackRatio = blackish / total
+
+      if (blackRatio > 0.9) {
+        return { ok: false, message: 'Foto fora do padrão. Mantenha a câmera estável e tente novamente.' }
+      }
+      if (avg < 40) {
+        return { ok: false, message: 'Foto muito escura. Vá para um local com mais luz e tente novamente.' }
+      }
+      if (avg > 220) {
+        return { ok: false, message: 'Foto com excesso de luz. Evite luz direta e tente novamente.' }
+      }
+      if (stddev < 15) {
+        return { ok: false, message: 'Foto fora do padrão. Mantenha a câmera estável e tente novamente.' }
+      }
+      return { ok: true, message: 'Foto registrada com sucesso' }
+    } catch (e) {
+      // Se leitura dos pixels falhar (ex: canvas tainted), aceita a foto
+      return { ok: true, message: 'Foto registrada com sucesso' }
+    }
+  }
+
+  // ─── Guias visuais SVG por foto ─────────────────────────────────────────────
+  function guideSvgHtml(idx) {
+    var STROKE = 'stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-dasharray="8 4" fill="none"'
+    var svgInner = ''
+    var label = ''
+    if (idx === 0) {
+      // Frente: elipse centrada no terço superior + linha do cabelo
+      label = 'Centralize seu rosto aqui'
+      svgInner =
+        '<ellipse cx="150" cy="130" rx="78" ry="100" ' + STROKE + '/>' +
+        '<line x1="80" y1="85" x2="220" y2="85" ' + STROKE + '/>'
+    } else if (idx === 1) {
+      // Topo: círculo centralizado
+      label = 'Abaixe a cabeça — topo centralizado'
+      svgInner = '<circle cx="150" cy="200" r="105" ' + STROKE + '/>'
+    } else if (idx === 2) {
+      // Lateral direita: elipse inclinada
+      label = 'Vire para a direita até o ombro'
+      svgInner =
+        '<ellipse cx="150" cy="180" rx="75" ry="105" transform="rotate(-8 150 180)" ' + STROKE + '/>'
+    } else {
+      // Lateral esquerda: espelhada
+      label = 'Vire para a esquerda até o ombro'
+      svgInner =
+        '<ellipse cx="150" cy="180" rx="75" ry="105" transform="rotate(8 150 180)" ' + STROKE + '/>'
+    }
+    var svg =
+      '<svg class="bhi-dx-guide" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+      svgInner + '</svg>'
+    return '<div class="bhi-dx-guide-label">' + label + '</div>' + svg
   }
 
   // ─── Step 3: Form ────────────────────────────────────────────────────────────
@@ -604,6 +725,7 @@
       step: 1,
       fotoIndex: 0,
       fotos: [null, null, null, null],
+      validacoes: [null, null, null, null],
       stream: null,
       formData: { nome: '', email: '', telefone: '' },
       loadingTimer: null,
@@ -625,7 +747,8 @@
   }
 
   function escListener(e) {
-    if (e.key === 'Escape' && state.step !== 4) closeModal()
+    var isLoadingStep = state.step === 4 && state._success === null
+    if (e.key === 'Escape' && !isLoadingStep) closeModal()
   }
 
   // ─── Auto-wire de CTAs ───────────────────────────────────────────────────────
