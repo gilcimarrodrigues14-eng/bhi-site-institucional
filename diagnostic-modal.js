@@ -149,7 +149,7 @@
 .bhi-dx-preview-img{width:100%;height:100%;object-fit:cover;display:block}
 /* scaleX(-1) = só espelhamento (efeito selfie). Sem zoom CSS — preview e foto final ficam no mesmo enquadramento. */
 .bhi-dx-video{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1);transform-origin:center center}
-.bhi-dx-guide{position:absolute;left:15%;top:15%;width:70%;height:70%;pointer-events:none;z-index:5;animation:bhi-dx-guide-pulse 2s ease-in-out infinite}
+.bhi-dx-guide{position:absolute;left:5%;top:5%;width:90%;height:90%;pointer-events:none;z-index:5;animation:bhi-dx-guide-pulse 2s ease-in-out infinite}
 @keyframes bhi-dx-guide-pulse{0%,100%{opacity:.6}50%{opacity:1}}
 .bhi-dx-guide-label{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-size:10px;font-weight:600;letter-spacing:.8px;padding:6px 14px;border-radius:14px;text-align:center;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;z-index:6;font-family:'Montserrat',Arial,sans-serif}
 .bhi-dx-preview-img{transition:outline .2s}
@@ -479,13 +479,16 @@
     var video = document.getElementById('bhi-dx-video')
     if (!video || !video.videoWidth) return
 
-    // Sem crop — preview e foto final no mesmo enquadramento (sem zoom CSS)
+    // Crop centrado de 90% — coincide com a área do molde SVG visível no preview
+    // (CSS .bhi-dx-guide ocupa 90% × 90% centralizado). O retrato salvo é
+    // exatamente o que o usuário viu encaixado no molde.
     var srcW = video.videoWidth
     var srcH = video.videoHeight
-    var cropX = 0
-    var cropY = 0
-    var cropW = srcW
-    var cropH = srcH
+    var GUIDE_RATIO = 0.90
+    var cropW = Math.round(srcW * GUIDE_RATIO)
+    var cropH = Math.round(srcH * GUIDE_RATIO)
+    var cropX = Math.round((srcW - cropW) / 2)
+    var cropY = Math.round((srcH - cropH) / 2)
 
     // Limita resolução final pra não inflar o upload
     var maxOutW = 1080
@@ -596,24 +599,10 @@
           hint: '',
         }
       }
-      if (nitidez < 3) {
-        return {
-          ok: false,
-          tipo: 'DESFOCADA',
-          icon: '📷',
-          message: 'Foto muito desfocada. Mantenha o celular firme e tente novamente.',
-          hint: '',
-        }
-      }
-      if (stddev < 6) {
-        return {
-          ok: false,
-          tipo: 'UNIFORME',
-          icon: '✗',
-          message: 'Imagem sem detalhes suficientes. Aproxime mais o rosto do guia.',
-          hint: '',
-        }
-      }
+      // Checagem de nitidez/uniformidade removida — só valida iluminação.
+      // (Selfie do rosto pode ter fundo uniforme e leve borrão sem prejudicar
+      // a análise. Foco do filtro é só barrar foto preta/escura/estourada.)
+      void nitidez; void stddev;
       return {
         ok: true,
         tipo: 'OK',
