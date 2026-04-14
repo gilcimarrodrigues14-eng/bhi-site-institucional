@@ -309,5 +309,6 @@ const n=document.getElementById('nav');
 if(n)window.addEventListener('scroll',()=>n.style.background=window.scrollY>40?'rgba(6,12,26,.97)':'rgba(6,12,26,.97)',{passive:true});
 document.querySelectorAll('.faq-q').forEach(q=>{q.addEventListener('click',()=>{const i=q.parentElement;const o=i.classList.contains('open');document.querySelectorAll('.faq-item').forEach(x=>x.classList.remove('open'));if(!o)i.classList.add('open');})});
 </script>
+<script src="/diagnostic-modal.js" defer></script>
 </body>
 </html>

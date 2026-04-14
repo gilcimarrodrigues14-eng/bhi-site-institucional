@@ -628,6 +628,90 @@
     if (e.key === 'Escape' && state.step !== 4) closeModal()
   }
 
+  // ─── Auto-wire de CTAs ───────────────────────────────────────────────────────
+  // Religa todos os CTAs do site institucional pra abrir o modal sem mexer no
+  // HTML de cada página. Cobre 3 padrões:
+  //   1. Qualquer link cujo href termine em "#portal" (convenção do site —
+  //      todos os botões "Iniciar Diagnóstico", "Agendar Avaliação", "Iniciar
+  //      Diagnóstico por IA", "Diagnóstico Gratuito", etc. apontam pra cá).
+  //   2. Qualquer link pro WhatsApp do BHI (wa.me/5547992495146 ou API),
+  //      conforme especificação que pede para botões "Falar no WhatsApp"
+  //      também caírem no fluxo do modal.
+  //   3. Escape hatch via atributo HTML: data-bhi-dx="open"
+  //
+  // Roda no DOMContentLoaded e novamente após mudanças via MutationObserver
+  // (alguns botões mobile são injetados dinamicamente pelo menu hambúrguer).
+  var BHI_PHONE_DIGITS = '5547992495146'
+
+  function isCtaCandidate(el) {
+    if (!el || el.dataset && el.dataset.bhiDxBound === '1') return false
+    if (el.hasAttribute && el.hasAttribute('data-bhi-dx')) return true
+    if (el.tagName !== 'A') return false
+    var href = el.getAttribute('href') || ''
+    if (!href) return false
+    // Match exato ou termina em "#portal" (substring no fim, evitando falso
+    // positivo do bug de length-7 com indexOf retornando -1)
+    var idxPortal = href.indexOf('#portal')
+    if (idxPortal !== -1 && idxPortal === href.length - 7) return true
+    if (href.indexOf('wa.me/' + BHI_PHONE_DIGITS) !== -1) return true
+    if (href.indexOf('api.whatsapp.com/send') !== -1 && href.indexOf(BHI_PHONE_DIGITS) !== -1) return true
+    return false
+  }
+
+  function bindCta(el) {
+    if (!el || (el.dataset && el.dataset.bhiDxBound === '1')) return
+    el.addEventListener('click', function (e) {
+      e.preventDefault()
+      e.stopPropagation()
+      try {
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'open_diagnostic_modal', {
+            event_category: 'Diagnostico',
+            event_label: el.textContent.trim().slice(0, 80) || el.getAttribute('aria-label') || 'cta',
+          })
+        }
+      } catch (e2) {}
+      openModal()
+      return false
+    }, true)
+    if (el.dataset) el.dataset.bhiDxBound = '1'
+  }
+
+  function autoWireCTAs(root) {
+    var scope = root || document
+    var nodes = scope.querySelectorAll('a, [data-bhi-dx]')
+    for (var i = 0; i < nodes.length; i++) {
+      if (isCtaCandidate(nodes[i])) bindCta(nodes[i])
+    }
+  }
+
+  function initAutoWire() {
+    autoWireCTAs(document)
+    // Observa o DOM pra capturar CTAs adicionados depois do load (ex.: menus
+    // mobile lazy, modais de outras features, etc.)
+    if (typeof MutationObserver !== 'undefined') {
+      var mo = new MutationObserver(function (mutations) {
+        for (var i = 0; i < mutations.length; i++) {
+          var m = mutations[i]
+          for (var j = 0; j < m.addedNodes.length; j++) {
+            var n = m.addedNodes[j]
+            if (n.nodeType === 1) {
+              if (isCtaCandidate(n)) bindCta(n)
+              if (n.querySelectorAll) autoWireCTAs(n)
+            }
+          }
+        }
+      })
+      mo.observe(document.documentElement || document.body, { childList: true, subtree: true })
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAutoWire)
+  } else {
+    initAutoWire()
+  }
+
   // Expor API global
   window.openDiagnosticModal = openModal
   window.closeDiagnosticModal = closeModal
