@@ -23,6 +23,7 @@
 
   // ─── Configuração ────────────────────────────────────────────────────────────
   var API_URL = 'https://bhi-platform-production.up.railway.app/api/portal/lead'
+  var MAX_TENTATIVAS = 5 // após N falhas consecutivas, libera "continuar assim mesmo"
 
   // ─── Definição das 4 fotos (ordem importa) ──────────────────────────────────
   var FOTOS = [
@@ -61,10 +62,13 @@
     step: 1,           // 1 = welcome, 2 = camera, 3 = form, 4 = loading/result
     fotoIndex: 0,      // 0..3
     fotos: [null, null, null, null], // Blob[]
+    validacoes: [null, null, null, null],
+    tentativas: [0, 0, 0, 0],
     stream: null,
     formData: { nome: '', email: '', telefone: '' },
     loadingTimer: null,
     loadingIdx: 0,
+    _success: null,
   }
 
   var rootEl = null
@@ -141,17 +145,27 @@
 @keyframes bhi-dx-eq{0%,100%{height:4px}50%{height:14px}}
 .bhi-dx-replay{display:block;margin:0 auto 12px;background:transparent;border:1px solid rgba(180,181,185,.25);color:#B4B5B9;font-size:11px;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:inherit}
 .bhi-dx-replay:hover{color:#fff;border-color:#fff}
-.bhi-dx-camera-wrap{position:relative;width:100%;aspect-ratio:3/4;max-height:48vh;background:#000;border-radius:10px;overflow:hidden;margin:6px 0 16px}
-.bhi-dx-video,.bhi-dx-preview-img{width:100%;height:100%;object-fit:cover;display:block}
-.bhi-dx-video{transform:scaleX(-1)}
-.bhi-dx-guide{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
-.bhi-dx-guide-label{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);color:#fff;font-size:11px;letter-spacing:.5px;padding:6px 12px;border-radius:14px;text-align:center;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis}
-.bhi-dx-preview-img.is-ok{outline:3px solid #1D9E75;outline-offset:-3px}
-.bhi-dx-preview-img.is-warn{outline:3px solid #EF9F27;outline-offset:-3px}
-.bhi-dx-validation{margin:-8px 0 10px;padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.45;display:flex;gap:8px;align-items:flex-start}
+.bhi-dx-camera-wrap{position:relative;width:100%;aspect-ratio:1/1;max-height:54vh;background:#000;border-radius:10px;overflow:hidden;margin:6px 0 16px}
+.bhi-dx-preview-img{width:100%;height:100%;object-fit:cover;display:block}
+/* scaleX(-1.6) + scaleY(1.6) = espelhamento + zoom 1.6x via CSS (fallback quando zoom nativo da câmera não é suportado) */
+.bhi-dx-video{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1.6) scaleY(1.6);transform-origin:center center}
+.bhi-dx-guide{position:absolute;left:15%;top:15%;width:70%;height:70%;pointer-events:none;z-index:5;animation:bhi-dx-guide-pulse 2s ease-in-out infinite}
+@keyframes bhi-dx-guide-pulse{0%,100%{opacity:.6}50%{opacity:1}}
+.bhi-dx-guide-label{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-size:10px;font-weight:600;letter-spacing:.8px;padding:6px 14px;border-radius:14px;text-align:center;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;z-index:6;font-family:'Montserrat',Arial,sans-serif}
+.bhi-dx-preview-img{transition:outline .2s}
+.bhi-dx-preview-img.is-ok{outline:2px solid #1D9E75;outline-offset:-2px}
+.bhi-dx-preview-img.is-warn{outline:2px solid #EF9F27;outline-offset:-2px}
+.bhi-dx-preview-img.is-error{outline:2px solid #CC0000;outline-offset:-2px}
+.bhi-dx-validation{margin:-8px 0 10px;padding:11px 13px;border-radius:8px;font-size:12px;line-height:1.45;display:flex;gap:9px;align-items:flex-start}
 .bhi-dx-validation.is-ok{background:rgba(29,158,117,.12);border:1px solid rgba(29,158,117,.4);color:#7fe0b6}
 .bhi-dx-validation.is-warn{background:rgba(239,159,39,.12);border:1px solid rgba(239,159,39,.45);color:#ffd596}
-.bhi-dx-validation-icon{flex-shrink:0;font-size:14px;line-height:1}
+.bhi-dx-validation.is-error{background:rgba(204,0,0,.12);border:1px solid rgba(204,0,0,.45);color:#ff9a9a}
+.bhi-dx-validation-icon{flex-shrink:0;font-size:15px;line-height:1.1}
+.bhi-dx-validation-body{flex:1}
+.bhi-dx-validation-hint{display:block;margin-top:4px;font-size:11px;opacity:.85}
+.bhi-dx-tries{display:block;text-align:center;font-size:10px;color:#B4B5B9;letter-spacing:.5px;text-transform:uppercase;margin:-4px 0 8px}
+.bhi-dx-btn-fallback{background:transparent;border:1px dashed rgba(180,181,185,.5);color:#B4B5B9;margin-top:8px}
+.bhi-dx-btn-fallback:hover{color:#fff;border-color:#fff}
 .bhi-dx-camera-error{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;color:#B4B5B9;font-size:13px;text-align:center;line-height:1.5}
 .bhi-dx-shutter{display:flex;justify-content:center;margin:0 0 12px}
 .bhi-dx-shutter-btn{width:64px;height:64px;border-radius:50%;background:#fff;border:4px solid rgba(255,255,255,.3);cursor:pointer;transition:transform .15s;padding:0}
@@ -262,6 +276,7 @@
     state.fotoIndex = 0
     state.fotos = [null, null, null, null]
     state.validacoes = [null, null, null, null]
+    state.tentativas = [0, 0, 0, 0]
     render()
     // Dispara áudio imediatamente dentro da mesma tarefa síncrona do clique
     // para não ser bloqueado pela política de autoplay em mobile.
@@ -300,8 +315,15 @@
 
     var capturedBlob = state.fotos[state.fotoIndex]
     var validation = (state.validacoes && state.validacoes[state.fotoIndex]) || null
+    var tentativas = (state.tentativas && state.tentativas[state.fotoIndex]) || 0
+    var hardErrorTypes = { PRETA: 1, DESFOCADA: 1, UNIFORME: 1 }
+    var isHardError = validation && !validation.ok && validation.tipo && hardErrorTypes[validation.tipo]
     var imgClass = 'bhi-dx-preview-img'
-    if (validation) imgClass += validation.ok ? ' is-ok' : ' is-warn'
+    if (validation) {
+      if (validation.ok) imgClass += ' is-ok'
+      else if (isHardError) imgClass += ' is-error'
+      else imgClass += ' is-warn'
+    }
     html += '<div class="bhi-dx-camera-wrap">'
     if (capturedBlob) {
       var url = URL.createObjectURL(capturedBlob)
@@ -313,24 +335,35 @@
     }
     html += '</div>'
 
+    if (tentativas > 0) {
+      html += '<span class="bhi-dx-tries">Tentativa ' + Math.min(tentativas, MAX_TENTATIVAS) + ' de ' + MAX_TENTATIVAS + '</span>'
+    }
+
     if (validation) {
-      var vCls = validation.ok ? 'is-ok' : 'is-warn'
-      var vIcon = validation.ok ? '✓' : '⚠'
+      var vCls = validation.ok ? 'is-ok' : (isHardError ? 'is-error' : 'is-warn')
+      var vIcon = validation.icon || (validation.ok ? '✓' : '⚠')
       html += '<div class="bhi-dx-validation ' + vCls + '">'
       html += '<span class="bhi-dx-validation-icon">' + vIcon + '</span>'
+      html += '<div class="bhi-dx-validation-body">'
       html += '<span>' + validation.message + '</span>'
+      if (validation.hint) html += '<span class="bhi-dx-validation-hint">' + validation.hint + '</span>'
+      html += '</div>'
       html += '</div>'
     }
 
     if (!capturedBlob) {
       html += '<div class="bhi-dx-shutter"><button type="button" class="bhi-dx-shutter-btn" id="bhi-dx-shutter" aria-label="Capturar foto"></button></div>'
     } else {
+      var allowFallback = validation && !validation.ok && tentativas >= MAX_TENTATIVAS
       html += '<div class="bhi-dx-actions">'
       html += '<button type="button" class="bhi-dx-btn bhi-dx-btn-secondary" id="bhi-dx-retake">Refazer</button>'
       var nextLabel = state.fotoIndex === FOTOS.length - 1 ? 'Continuar' : 'Próxima foto'
-      var nextDisabled = validation && !validation.ok ? ' disabled' : ''
+      var nextDisabled = validation && !validation.ok && !allowFallback ? ' disabled' : ''
       html += '<button type="button" class="bhi-dx-btn bhi-dx-btn-primary" id="bhi-dx-next"' + nextDisabled + '>' + nextLabel + '</button>'
       html += '</div>'
+      if (allowFallback) {
+        html += '<button type="button" class="bhi-dx-btn bhi-dx-btn-fallback" id="bhi-dx-fallback">Continuar assim mesmo</button>'
+      }
     }
 
     card.innerHTML += html
@@ -359,10 +392,21 @@
         falarInstrucao(FOTOS[state.fotoIndex].instrucao)
       })
 
+      var fallback = document.getElementById('bhi-dx-fallback')
+      if (fallback) fallback.addEventListener('click', function () {
+        if (state.validacoes && state.validacoes[state.fotoIndex]) {
+          state.validacoes[state.fotoIndex].ok = true
+          state.validacoes[state.fotoIndex]._forced = true
+        }
+        var btn = document.getElementById('bhi-dx-next')
+        if (btn) btn.click()
+      })
+
       var next = document.getElementById('bhi-dx-next')
       if (next) next.addEventListener('click', function () {
         var curVal = state.validacoes && state.validacoes[state.fotoIndex]
-        if (curVal && !curVal.ok) return
+        var curTries = (state.tentativas && state.tentativas[state.fotoIndex]) || 0
+        if (curVal && !curVal.ok && curTries < MAX_TENTATIVAS) return
         if (state.fotoIndex === FOTOS.length - 1) {
           stopCamera()
           state.step = 3
@@ -384,12 +428,37 @@
       showCameraError('Seu navegador não suporta acesso à câmera.')
       return Promise.resolve(false)
     }
+    // Constraints: câmera frontal, aspect 1:1 (quadrado força enquadramento mais
+    // próximo ao rosto), resolução alvo 1080x1080. O zoom 2.0 é tentado via
+    // advanced — se o device não suportar, o fallback CSS scale(1.6) no .bhi-dx-video
+    // garante que o frame ainda apareça aproximado.
     return navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: 'user' }, audio: false })
+      .getUserMedia({
+        video: {
+          facingMode: 'user',
+          width: { ideal: 1080 },
+          height: { ideal: 1080 },
+          aspectRatio: { ideal: 1.0 },
+          advanced: [{ zoom: 2.0 }],
+        },
+        audio: false,
+      })
       .then(function (stream) {
         state.stream = stream
         var video = document.getElementById('bhi-dx-video')
         if (video) video.srcObject = stream
+        // Tenta aplicar zoom nativo da câmera se suportado (browsers modernos)
+        try {
+          var track = stream.getVideoTracks()[0]
+          if (track && typeof track.getCapabilities === 'function') {
+            var caps = track.getCapabilities()
+            if (caps && typeof caps.zoom !== 'undefined') {
+              var zoomMax = caps.zoom.max || 4
+              var zoomTarget = Math.min(2.5, zoomMax)
+              track.applyConstraints({ advanced: [{ zoom: zoomTarget }] }).catch(function () {})
+            }
+          }
+        } catch (e) { /* sem zoom nativo — fallback CSS já cuida */ }
         return true
       })
       .catch(function (err) {
@@ -421,107 +490,227 @@
   function capturePhoto() {
     var video = document.getElementById('bhi-dx-video')
     if (!video || !video.videoWidth) return
+
+    // Crop centralizado: descarta 10% horizontal e 5% vertical de cada borda
+    // do frame, garantindo que a foto enviada ao backend foque no rosto/cabeça
+    // mesmo se o preview de câmera estiver mais aberto do que ideal.
+    var srcW = video.videoWidth
+    var srcH = video.videoHeight
+    var cropX = srcW * 0.10
+    var cropY = srcH * 0.05
+    var cropW = srcW * 0.80
+    var cropH = srcH * 0.90
+
+    // Limita resolução final pra não inflar o upload
+    var maxOutW = 1080
+    var outW = Math.min(cropW, maxOutW)
+    var outH = Math.round((outW / cropW) * cropH)
+
     var canvas = document.createElement('canvas')
-    var maxW = 1280
-    var ratio = video.videoWidth / video.videoHeight
-    var w = Math.min(video.videoWidth, maxW)
-    var h = Math.round(w / ratio)
-    canvas.width = w
-    canvas.height = h
+    canvas.width = outW
+    canvas.height = outH
     var ctx = canvas.getContext('2d')
     // IMPORTANTE: não espelhamos o canvas — o preview é espelhado só via CSS
     // para UX de selfie, mas a imagem enviada ao backend fica na orientação real.
-    ctx.drawImage(video, 0, 0, w, h)
-    var validation = validatePhoto(ctx, w, h)
+    ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, outW, outH)
+
+    var validation = validatePhoto(ctx, outW, outH)
+    var idx = state.fotoIndex
+    if (!state.tentativas) state.tentativas = [0, 0, 0, 0]
+    state.tentativas[idx] = (state.tentativas[idx] || 0) + 1
+
     canvas.toBlob(function (blob) {
       if (!blob) return
-      state.fotos[state.fotoIndex] = blob
+      // Se passou na validação OU se o usuário já atingiu o limite de tentativas,
+      // grava o blob. Caso contrário, mostra o feedback de erro mas mantém o
+      // estado de captura para a próxima tentativa.
+      if (validation.ok || state.tentativas[idx] >= MAX_TENTATIVAS) {
+        state.fotos[idx] = blob
+      } else {
+        state.fotos[idx] = blob // mantém pra preview, mas com flag de erro
+      }
       if (!state.validacoes) state.validacoes = [null, null, null, null]
-      state.validacoes[state.fotoIndex] = validation
+      state.validacoes[idx] = validation
       pararFala()
       render()
     }, 'image/jpeg', 0.85)
   }
 
   // ─── Validação de qualidade da foto (client-side) ───────────────────────────
+  // Retorna { ok, tipo, message, hint, icon } onde tipo ∈
+  //   OK | PRETA | ESCURA | CLARA | DESFOCADA | UNIFORME
   function validatePhoto(ctx, w, h) {
     try {
-      // Amostragem 1 em cada 4x4 pixels (reduz custo sem perder precisão útil)
-      var step = 4
       var img = ctx.getImageData(0, 0, w, h)
       var data = img.data
-      var total = 0
-      var sum = 0
-      var blackish = 0
-      var lumas = []
-      for (var y = 0; y < h; y += step) {
-        for (var x = 0; x < w; x += step) {
-          var i = (y * w + x) * 4
-          var r = data[i]
-          var g = data[i + 1]
-          var b = data[i + 2]
-          var luma = r * 0.299 + g * 0.587 + b * 0.114
-          sum += luma
-          lumas.push(luma)
-          if (r < 10 && g < 10 && b < 10) blackish++
-          total++
-        }
+      var totalPixels = data.length / 4
+
+      var totalLum = 0
+      var blackPx = 0
+      var lumas = new Float32Array(totalPixels)
+
+      // Loop completo sobre todos os pixels (cálculo de luminância + contagem
+      // de pretos + buffer pra desvio padrão e nitidez)
+      for (var i = 0, p = 0; i < data.length; i += 4, p++) {
+        var r = data[i]
+        var g = data[i + 1]
+        var b = data[i + 2]
+        var luma = r * 0.299 + g * 0.587 + b * 0.114
+        totalLum += luma
+        lumas[p] = luma
+        if (r < 10 && g < 10 && b < 10) blackPx++
       }
-      if (total === 0) return { ok: true, message: 'Foto registrada com sucesso' }
-      var avg = sum / total
-      // Desvio padrão
+
+      var avg = totalLum / totalPixels
+      var blackRatio = blackPx / totalPixels
+
+      // Desvio padrão da luminância
       var varSum = 0
-      for (var k = 0; k < lumas.length; k++) {
+      for (var k = 0; k < totalPixels; k++) {
         var d = lumas[k] - avg
         varSum += d * d
       }
-      var stddev = Math.sqrt(varSum / total)
-      var blackRatio = blackish / total
+      var stddev = Math.sqrt(varSum / totalPixels)
 
-      if (blackRatio > 0.9) {
-        return { ok: false, message: 'Foto fora do padrão. Mantenha a câmera estável e tente novamente.' }
+      // Nitidez via Laplaciano simplificado (variação horizontal absoluta entre
+      // canais R consecutivos). Quanto maior, mais bordas — mais nítida.
+      var sharpSum = 0
+      for (var j = 0; j < data.length - 4; j += 4) {
+        sharpSum += Math.abs(data[j] - data[j + 4])
       }
-      if (avg < 40) {
-        return { ok: false, message: 'Foto muito escura. Vá para um local com mais luz e tente novamente.' }
+      var nitidez = sharpSum / totalPixels
+
+      if (blackRatio > 0.85) {
+        return {
+          ok: false,
+          tipo: 'PRETA',
+          icon: '✗',
+          message: 'Câmera bloqueada ou tampada. Verifique se a câmera está desobstruída.',
+          hint: '',
+        }
       }
-      if (avg > 220) {
-        return { ok: false, message: 'Foto com excesso de luz. Evite luz direta e tente novamente.' }
+      if (avg < 45) {
+        return {
+          ok: false,
+          tipo: 'ESCURA',
+          icon: '💡',
+          message: 'Ambiente muito escuro. Aproxime-se de uma fonte de luz ou acenda a luz do ambiente.',
+          hint: '',
+        }
       }
-      if (stddev < 15) {
-        return { ok: false, message: 'Foto fora do padrão. Mantenha a câmera estável e tente novamente.' }
+      if (avg > 215) {
+        return {
+          ok: false,
+          tipo: 'CLARA',
+          icon: '☀️',
+          message: 'Excesso de luz ou reflexo. Evite luz direta no rosto e afaste-se de janelas.',
+          hint: '',
+        }
       }
-      return { ok: true, message: 'Foto registrada com sucesso' }
+      if (nitidez < 8) {
+        return {
+          ok: false,
+          tipo: 'DESFOCADA',
+          icon: '📷',
+          message: 'Foto desfocada. Mantenha o celular parado por 2 segundos antes de capturar.',
+          hint: 'Apoie o cotovelo em algo firme para estabilizar.',
+        }
+      }
+      if (stddev < 12) {
+        return {
+          ok: false,
+          tipo: 'UNIFORME',
+          icon: '✗',
+          message: 'Foto fora do padrão. Certifique-se de que o rosto está enquadrado no guia.',
+          hint: '',
+        }
+      }
+      return {
+        ok: true,
+        tipo: 'OK',
+        icon: '✓',
+        message: 'Foto registrada com sucesso.',
+        hint: '',
+      }
     } catch (e) {
-      // Se leitura dos pixels falhar (ex: canvas tainted), aceita a foto
-      return { ok: true, message: 'Foto registrada com sucesso' }
+      // Se leitura dos pixels falhar (canvas tainted), aceita a foto
+      return { ok: true, tipo: 'OK', icon: '✓', message: 'Foto registrada com sucesso.', hint: '' }
     }
   }
 
-  // ─── Guias visuais SVG por foto ─────────────────────────────────────────────
+  // ─── Guias visuais SVG por foto (silhuetas realistas de rosto) ──────────────
+  // Cada SVG ocupa ~70% da área central do preview (via CSS .bhi-dx-guide) e
+  // tem uma animação suave de pulse pra chamar atenção do usuário.
   function guideSvgHtml(idx) {
-    var STROKE = 'stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-dasharray="8 4" fill="none"'
+    var STROKE = 'stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-dasharray="6 3" fill="rgba(255,255,255,0.04)"'
+    var STROKE_THIN = 'stroke="rgba(255,255,255,0.55)" stroke-width="1" stroke-dasharray="4 3" fill="none"'
+    var DOT = 'fill="rgba(255,255,255,0.8)"'
     var svgInner = ''
     var label = ''
+
     if (idx === 0) {
-      // Frente: elipse centrada no terço superior + linha do cabelo
-      label = 'Centralize seu rosto aqui'
+      // ── FOTO 1 — Rosto de FRENTE ───────────────────────────────────────────
+      // Oval do rosto, linha do couro cabeludo (arco), entradas laterais,
+      // referência de sobrancelhas, queixo, e marcação das duas orelhas.
+      label = 'CENTRALIZE SEU ROSTO'
       svgInner =
-        '<ellipse cx="150" cy="130" rx="78" ry="100" ' + STROKE + '/>' +
-        '<line x1="80" y1="85" x2="220" y2="85" ' + STROKE + '/>'
+        // Oval do rosto (mais largo no centro, estreitando no queixo)
+        '<path d="M150,80 C100,80 75,140 75,200 C75,260 105,310 150,320 C195,310 225,260 225,200 C225,140 200,80 150,80 Z" ' + STROKE + '/>' +
+        // Linha do couro cabeludo (arco que sobe no centro)
+        '<path d="M85,115 Q150,75 215,115" ' + STROKE_THIN + '/>' +
+        // Entradas laterais (dois recuos)
+        '<path d="M88,118 Q98,128 105,120" ' + STROKE_THIN + '/>' +
+        '<path d="M212,118 Q202,128 195,120" ' + STROKE_THIN + '/>' +
+        // Linha das sobrancelhas
+        '<line x1="95" y1="170" x2="205" y2="170" ' + STROKE_THIN + '/>' +
+        // Linha do queixo
+        '<line x1="115" y1="315" x2="185" y2="315" ' + STROKE_THIN + '/>' +
+        // Pontos de orelha
+        '<circle cx="78" cy="200" r="4" ' + DOT + '/>' +
+        '<circle cx="222" cy="200" r="4" ' + DOT + '/>'
     } else if (idx === 1) {
-      // Topo: círculo centralizado
-      label = 'Abaixe a cabeça — topo centralizado'
-      svgInner = '<circle cx="150" cy="200" r="105" ' + STROKE + '/>'
+      // ── FOTO 2 — Topo da cabeça (cabeça baixa) ─────────────────────────────
+      // Oval largo arredondado, divisão central (risco), círculo do vértex,
+      // pontos de orelha laterais.
+      label = 'ABAIXE A CABEÇA — TOPO CENTRALIZADO'
+      svgInner =
+        // Oval largo do topo da cabeça
+        '<ellipse cx="150" cy="200" rx="115" ry="135" ' + STROKE + '/>' +
+        // Linha de divisão / risco do cabelo
+        '<line x1="150" y1="68" x2="150" y2="200" ' + STROKE_THIN + '/>' +
+        // Círculo da coroa (vértex)
+        '<circle cx="150" cy="200" r="32" ' + STROKE_THIN + '/>' +
+        // Pontos de orelha (extremidades)
+        '<circle cx="38" cy="200" r="5" ' + DOT + '/>' +
+        '<circle cx="262" cy="200" r="5" ' + DOT + '/>'
     } else if (idx === 2) {
-      // Lateral direita: elipse inclinada
-      label = 'Vire para a direita até o ombro'
+      // ── FOTO 3 — Perfil lateral direito ────────────────────────────────────
+      // Silhueta de rosto em perfil olhando para a direita (do ponto de vista
+      // do espectador), linha do nariz, queixo, pescoço, orelha em forma de C.
+      label = 'LATERAL DIREITA — ORELHA VISÍVEL'
       svgInner =
-        '<ellipse cx="150" cy="180" rx="75" ry="105" transform="rotate(-8 150 180)" ' + STROKE + '/>'
+        // Contorno do rosto em perfil (testa → nariz → boca → queixo → pescoço)
+        '<path d="M115,90 C95,140 100,170 130,180 L155,210 L130,225 L135,260 C140,290 130,310 115,330" ' + STROKE + '/>' +
+        // Topo da cabeça → nuca
+        '<path d="M115,90 C160,70 220,90 230,160 C235,220 215,280 195,320" ' + STROKE_THIN + '/>' +
+        // Pescoço
+        '<line x1="115" y1="330" x2="195" y2="330" ' + STROKE_THIN + '/>' +
+        // Orelha em forma de C
+        '<path d="M195,180 Q210,180 210,200 Q210,220 195,220" ' + STROKE_THIN + '/>' +
+        // Seta indicando direção "olhe para a direita"
+        '<path d="M250,200 L280,200 M270,190 L280,200 L270,210" stroke="rgba(255,255,255,0.85)" stroke-width="2" fill="none"/>'
     } else {
-      // Lateral esquerda: espelhada
-      label = 'Vire para a esquerda até o ombro'
+      // ── FOTO 4 — Perfil lateral esquerdo ───────────────────────────────────
+      // Mesmo SVG da Foto 3, espelhado horizontalmente (transform scale(-1,1))
+      label = 'LATERAL ESQUERDA — ORELHA VISÍVEL'
       svgInner =
-        '<ellipse cx="150" cy="180" rx="75" ry="105" transform="rotate(8 150 180)" ' + STROKE + '/>'
+        '<g transform="translate(300,0) scale(-1,1)">' +
+        '<path d="M115,90 C95,140 100,170 130,180 L155,210 L130,225 L135,260 C140,290 130,310 115,330" ' + STROKE + '/>' +
+        '<path d="M115,90 C160,70 220,90 230,160 C235,220 215,280 195,320" ' + STROKE_THIN + '/>' +
+        '<line x1="115" y1="330" x2="195" y2="330" ' + STROKE_THIN + '/>' +
+        '<path d="M195,180 Q210,180 210,200 Q210,220 195,220" ' + STROKE_THIN + '/>' +
+        '<path d="M250,200 L280,200 M270,190 L280,200 L270,210" stroke="rgba(255,255,255,0.85)" stroke-width="2" fill="none"/>' +
+        '</g>'
     }
     var svg =
       '<svg class="bhi-dx-guide" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
@@ -726,6 +915,7 @@
       fotoIndex: 0,
       fotos: [null, null, null, null],
       validacoes: [null, null, null, null],
+      tentativas: [0, 0, 0, 0],
       stream: null,
       formData: { nome: '', email: '', telefone: '' },
       loadingTimer: null,
