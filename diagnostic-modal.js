@@ -262,7 +262,9 @@
     html += '</div>'
     html += '<button type="button" class="bhi-dx-btn bhi-dx-btn-primary" id="bhi-dx-start">Iniciar capturas</button>'
     html += '<button type="button" class="bhi-dx-link" id="bhi-dx-cancel">Fechar</button>'
-    card.innerHTML += html
+    // insertAdjacentHTML preserva o closeBtn (X) e seu listener já adicionado
+    // via addEventListener — usar innerHTML+= re-parseia tudo e destrói o listener.
+    card.insertAdjacentHTML('beforeend', html)
     setTimeout(function () {
       var startBtn = document.getElementById('bhi-dx-start')
       var cancelBtn = document.getElementById('bhi-dx-cancel')
@@ -366,7 +368,7 @@
       }
     }
 
-    card.innerHTML += html
+    card.insertAdjacentHTML('beforeend', html)
 
     setTimeout(function () {
       // Hook up video stream
@@ -639,9 +641,16 @@
       '<path d="M30,320 L30,345 L55,345" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>' +
       '<path d="M270,320 L270,345 L245,345" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>'
 
+    // A silhueta "esquerda" (idx=3) estava desenhada virada pro lado errado.
+    // Aplica espelhamento horizontal via SVG transform só nessa imagem —
+    // translate(300,0) scale(-1,1) inverte em torno do eixo X central do viewBox.
+    var imageTag = idx === 3
+      ? '<image href="' + src + '" x="20" y="20" width="260" height="360" preserveAspectRatio="xMidYMid meet" opacity="0.95" transform="translate(300,0) scale(-1,1)"/>'
+      : '<image href="' + src + '" x="20" y="20" width="260" height="360" preserveAspectRatio="xMidYMid meet" opacity="0.95"/>'
+
     var svg =
       '<svg class="bhi-dx-guide" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
-        '<image href="' + src + '" x="20" y="20" width="260" height="360" preserveAspectRatio="xMidYMid meet" opacity="0.95"/>' +
+        imageTag +
         CORNERS +
       '</svg>'
     return '<div class="bhi-dx-guide-label">' + label + '</div>' + svg
@@ -659,7 +668,7 @@
     html += fieldHtml('telefone', 'WhatsApp', 'tel', d.telefone, 'WhatsApp obrigatório')
     html += '<button type="submit" class="bhi-dx-btn bhi-dx-btn-primary" style="margin-top:8px">Enviar para análise</button>'
     html += '</form>'
-    card.innerHTML += html
+    card.insertAdjacentHTML('beforeend', html)
 
     setTimeout(function () {
       var form = document.getElementById('bhi-dx-form')
@@ -720,13 +729,13 @@
   // ─── Step 4: Loading + Result ────────────────────────────────────────────────
   function renderStep4(card) {
     if (state._success === true) {
-      card.innerHTML +=
+      card.insertAdjacentHTML('beforeend',
         '<div class="bhi-dx-result">' +
           '<div class="bhi-dx-result-icon">✓</div>' +
           '<h3>Diagnóstico concluído.</h3>' +
           '<p>Seu laudo técnico foi preparado. Em instantes você receberá no WhatsApp o resultado completo da análise com as recomendações do nosso time.</p>' +
           '<button type="button" class="bhi-dx-btn bhi-dx-btn-primary" id="bhi-dx-close-final">Fechar</button>' +
-        '</div>'
+        '</div>')
       setTimeout(function () {
         var b = document.getElementById('bhi-dx-close-final')
         if (b) b.addEventListener('click', closeModal)
@@ -734,13 +743,13 @@
       return
     }
     if (state._success === false) {
-      card.innerHTML +=
+      card.insertAdjacentHTML('beforeend',
         '<div class="bhi-dx-result">' +
           '<div class="bhi-dx-result-icon" style="background:#ff8b8b;color:#fff">!</div>' +
           '<h3>Não conseguimos enviar</h3>' +
           '<p>Ocorreu um problema ao enviar suas imagens. Por favor, tente novamente.</p>' +
           '<button type="button" class="bhi-dx-btn bhi-dx-btn-primary" id="bhi-dx-retry">Tentar novamente</button>' +
-        '</div>'
+        '</div>')
       setTimeout(function () {
         var b = document.getElementById('bhi-dx-retry')
         if (b) b.addEventListener('click', function () {
@@ -752,11 +761,11 @@
       return
     }
     // loading
-    card.innerHTML +=
+    card.insertAdjacentHTML('beforeend',
       '<div class="bhi-dx-loading">' +
         '<div class="bhi-dx-spinner"></div>' +
         '<div class="bhi-dx-loading-text" id="bhi-dx-loading-text">' + LOADING_MESSAGES[0] + '</div>' +
-      '</div>'
+      '</div>')
 
     // close button hidden during loading (we removed it earlier in render())
   }
