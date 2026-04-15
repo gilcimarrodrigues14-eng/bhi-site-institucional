@@ -831,8 +831,15 @@
           if (typeof window.gtag === 'function') {
             window.gtag('event', 'diagnostico_enviado', { event_category: 'Diagnostico' })
           }
+          // Meta Pixel — evento Lead com parâmetros completos para otimização
+          // algorítmica do Meta Ads (ticket médio da cirurgia capilar).
           if (typeof window.fbq === 'function') {
-            window.fbq('track', 'Lead', { content_name: 'Diagnostico Capilar' })
+            window.fbq('track', 'Lead', {
+              content_name: 'Diagnóstico Capilar BHI',
+              content_category: 'Transplante Capilar',
+              currency: 'BRL',
+              value: 20000
+            })
           }
         } catch (e) {}
       })
