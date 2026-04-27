@@ -40,8 +40,8 @@ html{scroll-behavior:smooth}
 body{font-family:var(--sans);background:var(--off);color:#000;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{text-decoration:none;color:inherit}
 img{display:block;max-width:100%;height:auto}
-.nav{position:fixed;top:0;left:0;right:0;z-index:999;height:72px;transition:all .4s;border-bottom:1px solid transparent}
-.nav.solid{background:rgba(6,12,26,0.97);border-bottom-color:var(--linha);backdrop-filter:blur(16px)}
+.nav{position:fixed;top:0;left:0;right:0;z-index:999;height:72px;background:rgba(6,12,26,0.97);border-bottom:1px solid var(--linha);backdrop-filter:blur(16px);transition:box-shadow .4s}
+.nav.solid{box-shadow:0 4px 24px rgba(0,0,0,0.25)}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;height:100%;max-width:1280px;margin:0 auto;padding:0 48px}
 .nav-logo{display:flex;flex-direction:column;gap:2px}
 .nav-logo-name{font-family:var(--serif);font-size:17px;font-weight:300;letter-spacing:5px;color:#fff;line-height:1}
